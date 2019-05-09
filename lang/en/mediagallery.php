@@ -129,6 +129,7 @@ $string['deleteorremoveitemwarn'] = 'By deleting you acknowledge you are:<br/>
 - deleting the media item from theBox<br/>
 - disabling all links made in other courses to this media item';
 $string['disablestandardgallery'] = 'Disable standard galleries';
+$string['swipeonly'] = 'Only allow swiping for users';
 $string['displayfullcaption'] = 'Display full caption text';
 $string['download'] = 'Download';
 $string['editgallery'] = 'Edit gallery';
@@ -335,3 +336,22 @@ $string['visibleother_help'] = 'Define the gallery as visible to other users aft
 $string['you'] = 'you';
 $string['youmusttypedelete'] = 'You must type DELETE to confirm deletion.';
 $string['youtubeurl'] = 'YouTube URL';
+
+// Strings for swiping functionality
+$string['card'] = 'Card';
+$string['liked'] = 'Liked';
+$string['disliked'] = 'Disliked';
+$string['comments'] = 'Comments';
+$string['configswipeonly'] = 'Simple media gallery with only swiping.';
+$string['contenttype'] = 'Content type';
+$string['contenttype_image'] = 'Image';
+$string['contenttype_text'] = 'Text';
+$string['contenttype_video'] = 'Video';
+$string['image-video-text'] = 'Add an image, a youtube video or some text';
+$string['notenoughcards'] = 'Please add more cards to this swipe deck';
+$string['pluginname'] = 'Media swipe';
+$string['editswipesettings'] = 'Edit swipe deck';
+$string['viewswipereport'] = 'View swipe report';
+$string['endofdeck'] = 'End of deck message';
+$string['viewswipe'] = 'View swipe deck';
+$string['downloadswipereport'] = 'Download report';

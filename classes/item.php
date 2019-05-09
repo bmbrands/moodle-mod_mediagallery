@@ -702,6 +702,49 @@ class item extends base {
         return $count;
     }
 
+    public function get_like_info() {
+        global $DB, $SESSION;
+        $info = new \stdClass();
+
+        $context = $this->get_context();
+        if (is_guest($context)) {
+            $dislikedcards = [];
+            if (isset($SESSION->dislikedcards)) {
+                $value = clean_param($SESSION->dislikedcards, PARAM_RAW);
+                if (!empty($value)) {
+                    $dislikedcards = json_decode($value);
+                }
+            }
+            $likedcards = [];
+            if (isset($SESSION->likedcards)) {
+                $value = clean_param($SESSION->likedcards, PARAM_RAW);
+                if (!empty($value)) {
+                    $likedcards = json_decode($value);
+                }
+            }
+            if (in_array($this->record->id, $dislikedcards)) {
+                $info->rated = true;
+            }
+            if (in_array($this->record->id, $likedcards)) {
+                $info->rated = true;
+                $info->likedbyme = true;
+            }
+        }
+
+        if ($this->gallery->can_like()) {
+            $info->likes = $DB->count_records('mediagallery_userfeedback', array('itemid' => $this->record->id, 'liked' => 1));
+            $info->dislikes = $DB->count_records('mediagallery_userfeedback', array('itemid' => $this->record->id, 'liked' => 0));
+            $info->likedbyme = false;
+
+            if ($fb = $this->get_userfeedback()) {
+                $info->rated = true;
+                if ($fb->liked) {
+                    $info->likedbyme = true;
+                }
+            }
+        }
+        return $info;
+    }
 
     public function get_socialinfo() {
         global $CFG, $DB;
@@ -726,6 +769,10 @@ class item extends base {
             $cmtopt->context = $this->get_context();
             $cmtopt->itemid = $this->record->id;
             $cmtopt->showcount = true;
+            $cmtopt->showcount     = true;
+            $cmtopt->notoggle      = true;
+            $cmtopt->autostart     = true;
+            $cmtopt->displaycancel = true;
             $cmtopt->component = 'mod_mediagallery';
             $cmtopt->autostart = true;
             $comment = new \comment($cmtopt);
@@ -758,8 +805,21 @@ class item extends base {
     }
 
     public function like() {
-        global $DB, $USER;
+        global $DB, $USER, $SESSION;
 
+        $context = $this->get_context();
+        if (is_guest($context)) {
+            $likedcards = [];
+            if (isset($SESSION->likedcards)) {
+                $value = clean_param($SESSION->likedcards, PARAM_RAW);
+                if (!empty($value)) {
+                    $likedcards = json_decode($value);
+                }
+            }
+            $likedcards[] = $this->record->id;
+            $cookievalue = json_encode($likedcards);
+            $SESSION->likedcards = $cookievalue;
+        }
         if (!has_capability('mod/mediagallery:like', $this->get_context())) {
             return false;
         }
@@ -827,19 +887,42 @@ class item extends base {
     }
 
     public function unlike() {
-        global $DB;
+        global $DB, $USER, $SESSION;
+
+        $context = $this->get_context();
+        if (is_guest($context)) {
+            $dislikedcards = [];
+            if (isset($SESSION->dislikedcards)) {
+                $value = clean_param($SESSION->dislikedcards, PARAM_RAW);
+                if (!empty($value)) {
+                    $dislikedcards = json_decode($value);
+                }
+            }
+            $dislikedcards[] = $this->record->id;
+            $cookievalue = json_encode($dislikedcards);
+            $SESSION->dislikedcards =  $cookievalue;
+
+            global $CFG;
+            $fh = fopen($CFG->dataroot . '/temp/unlikecookie.txt', 'w');
+            fwrite($fh, print_r($SESSION, true));
+            fclose($fh);
+        }
 
         if (!has_capability('mod/mediagallery:like', $this->get_context())) {
             return false;
         }
 
-        if (!$fb = $this->get_userfeedback()) {
-            // No record is the same as not liking it.
-            return;
+        if ($fb = $this->get_userfeedback()) {
+            $fb->liked = 0;
+            $DB->update_record('mediagallery_userfeedback', $fb);
+        } else {
+            $fb = (object) array(
+                'itemid' => $this->record->id,
+                'userid' => $USER->id,
+                'liked' => 0,
+            );
+            $DB->insert_record('mediagallery_userfeedback', $fb);
         }
-
-        $fb->liked = 0;
-        $DB->update_record('mediagallery_userfeedback', $fb);
         return $this->get_like_count();
     }
 

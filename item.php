@@ -103,8 +103,30 @@ if ($mform->is_cancelled()) {
         } else {
             $item = \mod_mediagallery\item::create($data);
         }
+        if (get_config('mediagallery', 'swipeonly')) {
 
-        if (!empty($data->content)) {
+            if ($data->contenttype == 'image') {
+                $info = file_get_draft_area_info($data->content);
+                file_save_draft_area_files($data->content, $context->id, 'mod_mediagallery', 'item', $item->id, $fmoptions);
+            }
+
+            if ($data->contenttype == 'image') {
+                $info = file_get_draft_area_info($data->content);
+                file_save_draft_area_files($data->content, $context->id, 'mod_mediagallery', 'item', $item->id, $fmoptions);
+            }
+
+            $params = array(
+                'context' => $context,
+                'objectid' => $item->id,
+                'other' => array(
+                    'copyright_id' => $data->copyright_id,
+                    'theme_id' => $data->theme_id,
+                ),
+            );
+            $event = \mod_mediagallery\event\item_updated::create($params);
+            $event->add_record_snapshot('mediagallery_item', $item->get_record());
+            $event->trigger();
+        } else if (!empty($data->content)) {
             $info = file_get_draft_area_info($data->content);
             file_save_draft_area_files($data->content, $context->id, 'mod_mediagallery', 'item', $item->id, $fmoptions);
 

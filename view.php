@@ -50,6 +50,10 @@ $options = array(
     'viewcontrols' => $viewcontrols,
 );
 if ($g) {
+    if (get_config('mediagallery', 'swipeonly') && !$editing) {
+        $swipeview = new moodle_url('/mod/mediagallery/swipe.php', array('g' => $g));
+        redirect($swipeview);
+    };
     $gallery = new \mod_mediagallery\gallery($g, $options);
     $gallery->sync($forcesync);
     $options['action'] = 'viewgallery';
@@ -137,8 +141,10 @@ if ($gallery) {
     $navurl->remove_params('editing');
     $node = $navnode->add(format_string($gallery->name), $navurl);
     $node->make_active();
-
+    if (get_config('mediagallery', 'swipeonly') && !$editing) {
+        $url = new moodle_url('/mod/mediagallery/swipe.php', array('g' => $gallery->id));
+        redirect($url);
+    }
 }
-
 $controller = new \mod_mediagallery\viewcontroller($context, $cm, $course, $mediagallery, $gallery, $pageurl, $options);
 echo $controller->display_action($options['action']);

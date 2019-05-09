@@ -70,7 +70,6 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
         }
 
         $galleryid = !empty($controller->gallery) ? $controller->gallery->id : 0;
-        $this->page->requires->css('/mod/mediagallery/css/fontawesome.min.css');
         $this->page->requires->js('/mod/mediagallery/js/screenfull.min.js');
         $this->page->requires->yui_module('moodle-mod_mediagallery-base', 'M.mod_mediagallery.base.init',
             array(
@@ -201,7 +200,11 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
         $o = html_writer::start_tag('div',
             array('class' => 'gallery_list_item', 'data-title' => $gallery->name, 'data-id' => $gallery->id));
 
-        $url = new moodle_url('/mod/mediagallery/view.php', array('g' => $gallery->id));
+        if (get_config('mediagallery', 'swipeonly')) {
+            $url = new moodle_url('/mod/mediagallery/swipe.php', array('g' => $gallery->id));
+        } else {
+            $url = new moodle_url('/mod/mediagallery/view.php', array('g' => $gallery->id));
+        }
         $img = html_writer::empty_tag('img', array('src' => $gallery->get_thumbnail()));
         $link = html_writer::link($url, $img);
         $o .= html_writer::tag('div', $link, array('class' => 'gthumbnail'));
@@ -333,18 +336,18 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
         $gallery = $renderable->gallery;
         $o = $this->gallery_heading($gallery);
 
-        if (!$renderable->nosample) {
-            $class = '';
-            $pix = 't/check';
-            if (!$gallery->moral_rights_asserted()) {
-                $class = ' no';
-                $pix = 'i/invalid';
-            }
-            $indicator = html_writer::empty_tag('img', array('src' => $this->output->image_url($pix)));
-            $o .= html_writer::tag('div', $indicator, array('class' => 'moralrights'.$class));
-            $link = html_writer::link('#', get_string('sample', 'mediagallery'), array('id' => 'mg_sample'));
-            $o .= html_writer::tag('div', $link, array('class' => 'moralrights_title'));
-        }
+        // if (!$renderable->nosample) {
+        //     $class = '';
+        //     $pix = 't/check';
+        //     if (!$gallery->moral_rights_asserted()) {
+        //         $class = ' no';
+        //         $pix = 'i/invalid';
+        //     }
+        //     $indicator = html_writer::empty_tag('img', array('src' => $this->output->image_url($pix)));
+        //     $o .= html_writer::tag('div', $indicator, array('class' => 'moralrights'.$class));
+        //     $link = html_writer::link('#', get_string('sample', 'mediagallery'), array('id' => 'mg_sample'));
+        //     $o .= html_writer::tag('div', $link, array('class' => 'moralrights_title'));
+        // }
 
         if ($gallery->mode != 'youtube' && !$renderable->editing) {
             $currentfocus = $gallery->type();
@@ -437,8 +440,7 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
      */
     public function collection_editing_actions(rencollection $renderable) {
         $links = $this->collection_editing_actions_list($renderable);
-        $content = implode(' &nbsp; ', $links);
-
+        $content = implode('', $links);
         $o = html_writer::div($content, 'actions collection');
         $o .= html_writer::div('', 'clearfix');
         return $o;
@@ -533,24 +535,40 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
         $addbulkitemurl = new moodle_url('/mod/mediagallery/item.php', array('g' => $gallery->id, 'bulk' => 1));
         $viewurl = new moodle_url('/mod/mediagallery/view.php', array('g' => $gallery->id));
         $editurl = new moodle_url('/mod/mediagallery/gallery.php', array('g' => $gallery->id));
+        $reporturl = new moodle_url('/mod/mediagallery/swipe.php', array('g' => $gallery->id, 'page' => 'report'));
         $exporturl = new moodle_url('/mod/mediagallery/export.php', array('g' => $gallery->id));
         $actions = array();
 
-        $maxitems = $gallery->get_collection()->maxitems;
-        if ($maxitems == 0 || count($gallery->get_items()) < $maxitems) {
+        if (get_config('mediagallery', 'swipeonly')) {
             $actions['add'] = $this->iconlink(get_string('addanitem', 'mediagallery'), $additemurl, 'plus');
-            if ($gallery->mode != 'youtube') {
-                $actions['addbulk'] = $this->iconlink(get_string('addbulkitems', 'mediagallery'), $addbulkitemurl, 'plus');
+            $actions['addbulk'] = $this->iconlink(get_string('addbulkitems', 'mediagallery'), $addbulkitemurl, 'plus');
+        } else {
+            $maxitems = $gallery->get_collection()->maxitems;
+            if ($maxitems == 0 || count($gallery->get_items()) < $maxitems) {
+                $actions['add'] = $this->iconlink(get_string('addanitem', 'mediagallery'), $additemurl, 'plus');
+                if ($gallery->mode != 'youtube') {
+                    $actions['addbulk'] = $this->iconlink(get_string('addbulkitems', 'mediagallery'), $addbulkitemurl, 'plus');
+                }
+            } else {
+                $actions['maxitems'] = html_writer::span(get_string('maxitemsreached', 'mediagallery'));
+            }
+        }
+        if (get_config('mediagallery', 'swipeonly')) {
+            $actions['view'] = $this->iconlink(get_string('viewswipe', 'mediagallery'), $viewurl, 'eye');
+            if ($gallery->user_can_edit()) {
+                $actions['edit'] = $this->iconlink(get_string('editswipesettings', 'mediagallery'), $editurl, 'pencil-square-o');
+                $actions['export'] = $this->iconlink(get_string('viewswipereport', 'mediagallery'), $reporturl, 'tasks');
             }
         } else {
-            $actions['maxitems'] = html_writer::span(get_string('maxitemsreached', 'mediagallery'));
+            $actions['view'] = $this->iconlink(get_string('viewgallery', 'mediagallery'), $viewurl, 'eye');
         }
-        $actions['view'] = $this->iconlink(get_string('viewgallery', 'mediagallery'), $viewurl, 'eye');
-        if ($gallery->user_can_edit()) {
-            $actions['edit'] = $this->iconlink(get_string('editgallerysettings', 'mediagallery'), $editurl, 'pencil-square-o');
-        }
-        if ($gallery->mode == 'standard' && $gallery->user_can_edit(null, true)) {
-            $actions['export'] = $this->iconlink(get_string('exportgallery', 'mediagallery'), $exporturl, 'share');
+        if (!get_config('mediagallery', 'swipeonly')) {
+            if ($gallery->user_can_edit()) {
+                $actions['edit'] = $this->iconlink(get_string('editgallerysettings', 'mediagallery'), $editurl, 'pencil-square-o');
+            }
+            if ($gallery->mode == 'standard' && $gallery->user_can_edit(null, true)) {
+                $actions['export'] = $this->iconlink(get_string('exportgallery', 'mediagallery'), $exporturl, 'share');
+            }
         }
 
         return $actions;
@@ -569,11 +587,11 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
     protected function iconlink($text, $link = null, $fa = null, $linkclass = '', $actionmenu = false) {
         $o = '';
         if ($fa) {
-            $icon = html_writer::tag('i', '', array('class' => 'mgfa mgfa-fw mgfa-lg mgfa-'.$fa));
+            $icon = html_writer::tag('i', '', array('class' => 'fa fa-fw fa-'.$fa));
         }
 
         if ($link) {
-            $class = $actionmenu ? 'action-menu' : 'maction';
+            $class = $actionmenu ? 'action-menu' : 'm-action btn btn-default mr-2';
             $linkclass = trim($linkclass.' '.$class);
             $o = html_writer::link($link, $icon.$text, array('class' => $linkclass));
         } else {
@@ -731,7 +749,7 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
      * @return string
      */
     public function embed_html($item) {
-        $mediarenderer = $this->page->get_renderer('core', 'media');
+        $mediarenderer = core_media_manager::instance();
         return $mediarenderer->embed_url(new moodle_url($item->get_embed_url()), '', 670, 377);
     }
 
@@ -1023,6 +1041,256 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
         $tagfields .= html_writer::empty_tag('input', array('id' => 'tagentry'));
         $o = html_writer::div($tagfields, 'tagcontainer');
         return $o;
+    }
+
+    /**
+     * Render a carousel of cards.
+     *
+     * @param \mod_mediagallery\gallery $gallery
+     * @param array $options
+     * @return string
+     */
+    public function view_cards(gallery $gallery) {
+
+        $template = new stdClass();
+        $template->modurl = new moodle_url('/mod/mediagallery/img/');
+        $template->type = $gallery->type(true);
+        $template->galleryname = $gallery->name;
+        $template->endofdeck = $gallery->agents;
+        $template->canedit = $gallery->user_can_edit();
+        $template->editurl = new moodle_url('/mod/mediagallery/view.php', array('g' => $gallery->id, 'editing' => 1));
+        $template->cards = [];
+
+        $showagain = optional_param('showagain', 0, PARAM_INT);
+
+        $first = true;
+        $previous = [];
+
+        $gallerycards = array_reverse($gallery->get_items());
+
+        if (count($gallerycards) < 2) {
+            $template->warning = get_string('notenoughcards', 'mod_mediagallery');
+            return $this->render_from_template('mod_mediagallery/swipe', $template);
+        }
+
+        $count = 0;
+        foreach ($gallerycards as $item) {
+            if (!$item->display) {
+                continue;
+            }
+
+            $type = $item->type();
+
+            $card = new stdClass();
+
+            // The first card is the lowest on the deck.
+            $card->first = $first ? true : false;
+            $first = false;
+
+            $card->type = $item->type();
+            $card->id = $item->id;
+            $card->like = $item->get_like_info();
+
+            if (isset($card->like->rated)) {
+                continue;
+            }
+
+            if (count($previous) >= 2) {
+                $card->preloadid = $previous[count($previous)-2];
+            }
+
+            if ($type == mcbase::TYPE_IMAGE) {
+                $card->isimage = true;
+                $card->img = $item->get_image_url_by_type('thumbnail');
+                $card->caption = $item->caption;
+                $card->itemhtml = $this->embed_html($item);
+            } else if ($type == mcbase::TYPE_VIDEO) {
+                $card->isvideo = true;
+                $card->img = $item->get_image_url_by_type('thumbnail');
+                $card->caption = $item->caption;
+                $card->embed = $item->get_embed_url();
+            } else {
+                $card->type = 3;
+                $card->istext = true;
+                $card->text = $item->description;
+                $card->caption = $item->caption;
+            }
+
+            $card->info = $item->get_structured_metainfo();
+            $template->cards[] = $card;
+            $previous[] = $item->id;
+            $count++;
+        }
+
+        // We need the last 2 cards (visually highest on the deck) to preload content.
+        $template->hascards = false;
+
+        if ($count > 2) {
+            $template->hascards = true;
+            $template->cards[($count - 2)]->preload = true;
+            $template->cards[($count - 1)]->preload = true;
+        } else if ($count == 2){
+            $template->hascards = true;
+            $template->cards[0]->preload = true;
+            $template->cards[1]->preload = true;
+        }
+
+        return $this->render_from_template('mod_mediagallery/swipe', $template);
+    }
+
+    public function view_cards_report(gallery $gallery) {
+
+        $template = new stdClass();
+        $gallerycards = $gallery->get_items();
+        $template->reportdownloadurl = new moodle_url('/mod/mediagallery/swipe.php', array('g' => $gallery->id, 'page' => 'exportxls'));
+
+        $context = $gallery->get_collection()->context;
+
+        foreach ($gallerycards as $item) {
+
+            $type = $item->type();
+            $card = new stdClass();
+
+            $card->id = $item->id;
+            $card->like = $item->get_like_info();
+
+            if ($type == mcbase::TYPE_IMAGE) {
+                $card->isimage = true;
+                $card->cardtype = get_string('contenttype_image', 'mod_mediagallery');
+                $card->img = $item->get_image_url_by_type('thumbnail');
+                $card->caption = $item->caption;
+                $card->itemhtml = $this->embed_html($item);
+            } else if ($type == mcbase::TYPE_VIDEO) {
+                $card->isvideo = true;
+                $card->cardtype = get_string('contenttype_video', 'mod_mediagallery');
+                $card->img = $item->get_image_url_by_type('thumbnail');
+                $card->caption = $item->caption;
+                $card->embed = $item->get_embed_url();
+            } else {
+                $card->type = 3;
+                $card->cardtype = get_string('contenttype_text', 'mod_mediagallery');
+                $card->istext = true;
+                $card->text = $item->description;
+                $card->caption = $item->caption;
+            }
+            $comments = $this->comment_for_card($card->id, $context);
+            $card->comments = $comments->get_comments();
+            $template->cards[] = $card;
+        }
+
+        return $this->render_from_template('mod_mediagallery/swipe_report', $template);
+    }
+
+    /**
+     * Generate the cards excel export.
+     */
+    public function view_cards_report_xls(gallery $gallery) {
+        global $CFG;
+        require_once($CFG->dirroot.'/lib/excellib.class.php');
+
+        $downloadfilename = $gallery->name . '.xls';
+        // Creating a workbook
+        $workbook = new MoodleExcelWorkbook("-");
+        // Sending HTTP headers
+        $workbook->send($downloadfilename);
+        // Adding the worksheet
+        $myxls = $workbook->add_worksheet('cards');
+
+        $tempdir = $CFG->dataroot . '/temp/swipe';
+
+        $context = $gallery->get_collection()->context;
+
+        // cleanup old stored temp cards.
+        if (file_exists($tempdir)) {
+            $objects = scandir($tempdir);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..") { 
+                    unlink($tempdir."/".$object);
+                }
+            }
+        } else {
+            mkdir($tempdir);
+        }
+
+        // Create xls header.
+        $myxls->set_column(0, 3, '40');
+        $myxls->write_string(0, 0, get_string('card', 'mod_mediagallery'), array('bold' => 1, 'size' => 16));
+        $myxls->write_string(0, 1, get_string('disliked', 'mod_mediagallery'), array('bold' => 1, 'color' => '#EB6E5A', 'size' => 16));
+        $myxls->write_string(0, 2, get_string('liked', 'mod_mediagallery'), array('bold' => 1, 'color' => '#86BD97', 'size' => 16));
+        $myxls->write_string(0, 3, get_string('comments', 'mod_mediagallery'), array('bold' => 1, 'size' => 16));
+        $myxls->set_row(0, 20);
+
+        $row = 1;
+        $gallerycards = $gallery->get_items();
+        $fs = get_file_storage();
+
+        // Add cards to xls.
+        foreach ($gallerycards as $item) {
+            $type = $item->type();
+            if ($type == mcbase::TYPE_IMAGE) {
+
+                // We need a file reference to store it in the workbook.
+                $file = $item->get_file('thumbnail');
+                $tempfile = $CFG->dataroot . '/temp/card-' . $file->get_filename();
+                $file->copy_content_to($tempfile);
+                $myxls->insert_bitmap($row, 0,  $tempfile, 0, 0, null, 0.6);
+                $myxls->set_row($row, 160);
+            } else if ($type == mcbase::TYPE_VIDEO) {
+                $videoname = get_string('contenttype_video', 'mod_mediagallery') . "\n" . $item->get_embed_url();
+                $myxls->write_string($row, 0, $videoname,
+                    array('text_wrap' => true, 'v_align' => 'top'));
+                $myxls->set_row($row, 80);
+            } else {
+                $myxls->write_string($row, 0, strip_tags($item->description),
+                    array('bold' => 1, 'size' => 15, 'text_wrap' => true, 'v_align' => 'top'));
+                $myxls->set_row($row, 80);
+            }
+
+            // Write the likes
+            $like = $item->get_like_info();
+            $myxls->write_string($row, 1, $like->dislikes,
+                array('v_align' => 'top', 'color' => '#EB6E5A', 'size' => 15));
+            $myxls->write_string($row, 2, $like->likes,
+                array('v_align' => 'top', 'color' => '#86BD97', 'size' => 15));
+
+            // Write the comments
+            $comments = $this->comment_for_card($item->id, $context);
+            $cardcomments = $comments->get_comments();
+            $commenttext = '';
+            foreach ($cardcomments as $cc) {
+                $commenttext .= strip_tags($cc->fullname) . ': ' . strip_tags($cc->content) . "\n";
+            }
+            $myxls->write_string($row, 3, $commenttext,
+                array('v_align' => 'top'));
+
+            $row++;
+        }
+        /// Close the workbook
+        $workbook->close();
+        exit;
+    }
+
+    /**
+     *
+     * @param int $cardid
+     * @return comment
+     */
+    public static function comment_for_card($cardid, $context) {
+        $options = new stdClass;
+        $options->area          = 'item';
+        $options->context       = $context;
+        $options->itemid        = $cardid;
+        $options->component     = 'mod_mediagallery';
+        $options->showcount     = true;
+        $options->notoggle      = true;
+        $options->autostart     = true;
+        $options->displaycancel = true;
+        $options->ignore_permission = true;
+
+        $api = new comment($options);
+        $api->set_fullwidth();
+
+        return $api;
     }
 }
 

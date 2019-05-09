@@ -31,6 +31,8 @@ require_once($CFG->dirroot.'/mod/mediagallery/classes/quickform/limitedurl.php')
 require_once($CFG->dirroot.'/mod/mediagallery/classes/quickform/uploader.php');
 require_once($CFG->dirroot.'/mod/mediagallery/classes/quickform/uploader_standard.php');
 
+
+use \mod_mediagallery\base as mcbase;
 /**
  * Module instance settings form.
  *
@@ -63,50 +65,124 @@ class mod_mediagallery_item_form extends moodleform {
             'maxfiles' => 0,
             'return_types' => null,
         );
-        $mform->addElement('editor', 'description', get_string('description'), null, $options);
+        if (!get_config('mediagallery', 'swipeonly')) {
+            $mform->addElement('editor', 'description', get_string('description'), null, $options);
 
-        $mform->addElement('selectyesno', 'display', get_string('itemdisplay', 'mediagallery'));
-        $mform->setDefault('display', 1);
-        $mform->addHelpButton('display', 'itemdisplay', 'mediagallery');
+            $mform->addElement('selectyesno', 'display', get_string('itemdisplay', 'mediagallery'));
+            $mform->setDefault('display', 1);
+            $mform->addHelpButton('display', 'itemdisplay', 'mediagallery');
 
-        $mform->addElement('selectyesno', 'thumbnail', get_string('gallerythumbnail', 'mediagallery'));
-        $default = $this->_customdata['firstitem'] ? 1 : 0;
-        $mform->setDefault('thumbnail', $default);
-        $mform->addHelpButton('thumbnail', 'gallerythumbnail', 'mediagallery');
+            $mform->addElement('selectyesno', 'thumbnail', get_string('gallerythumbnail', 'mediagallery'));
+            $default = $this->_customdata['firstitem'] ? 1 : 0;
+            $mform->setDefault('thumbnail', $default);
+            $mform->addHelpButton('thumbnail', 'gallerythumbnail', 'mediagallery');
+            $mform->addElement('static', 'filecheck', '', get_string('choosecontent', 'mediagallery'));
+        } else {
+            $mform->addElement('hidden', 'display', 1);
+            $mform->setType('display', PARAM_INT);
+            $mform->addElement('hidden', 'thumbnail', 0);
+            $mform->setType('thumbnail', PARAM_INT);
+            $mform->addElement('static', 'typecheck', '', get_string('image-video-text', 'mediagallery'));
+        }
 
-        $mform->addElement('static', 'filecheck', '', get_string('choosecontent', 'mediagallery'));
+        if (get_config('mediagallery', 'swipeonly')) {
+            $type = '';
+            if ($item) {
+                $type = $item->type();
+                if (empty($type)) {
+                    $type = 3;
+                }
+                $mform->addElement('hidden', 'itemtype', $type);
+            } else {
+                $mform->addElement('hidden', 'itemtype', 0);
+            }
+            $mform->setType('itemtype', PARAM_RAW);
 
-        if ($gallery->mode == 'standard') {
-            $mform->addElement('uploader_standard', 'content', get_string('content', 'mediagallery'), '0',
+            $options = array(
+                'text' => get_string('contenttype_text', 'mediagallery'),
+                'image' => get_string('contenttype_image', 'mediagallery'),
+                'video' => get_string('contenttype_video', 'mediagallery')
+            );
+            
+            if ($item) {
+                if ($type == 1) {
+                    $mform->addElement('hidden', 'contenttype', 'image');
+                }
+                if ($type == 2) {
+                    $mform->addElement('hidden', 'contenttype', 'video');
+                }
+                if ($type == 3) {
+                    $mform->addElement('hidden', 'contenttype', 'text');
+                }
+                $mform->setType('contenttype', PARAM_ALPHA);
+            } else {
+                $mform->addElement('select', 'contenttype', get_string('contenttype', 'mediagallery'), $options);
+            }
+
+
+            // Text type.
+            $mform->addElement('editor', 'description', get_string('contenttype_text', 'mediagallery'), null, $options);
+            $mform->disabledIf('description', 'contenttype', 'eq', 'video');
+            $mform->disabledIf('description', 'contenttype', 'eq', 'image');
+            if ($item) {
+                $mform->disabledIf('description', 'itemtype', 'neq', 3);
+            }
+
+            // Image type.
+            $mform->addElement('uploader_standard', 'content', get_string('contenttype_image', 'mediagallery'), '0',
                 mediagallery_filepicker_options($gallery));
             $mform->addHelpButton('content', 'content', 'mediagallery');
+            $mform->disabledIf('content', 'contenttype', 'eq', 'video');
+            $mform->disabledIf('content', 'contenttype', 'eq', 'text');
+            if ($item) {
+                $mform->disabledIf('content', 'itemtype', 'neq', 3);
+            }
 
-            $fpoptions = mediagallery_filepicker_options($gallery);
-            $fpoptions['accepted_types'] = array('web_image');
-            $fpoptions['return_types'] = FILE_INTERNAL;
-            $mform->addElement('filepicker', 'customthumbnail', get_string('thumbnail', 'mediagallery'), '0', $fpoptions);
-            $mform->addHelpButton('customthumbnail', 'thumbnail', 'mediagallery');
-        } else if ($gallery->mode == 'youtube') {
+            // Video type.
             $mform->addElement('limitedurl', 'externalurl', get_string('youtubeurl', 'mediagallery'), array('size' => '60'),
                 array('usefilepicker' => true, 'repo' => 'youtube'));
             $mform->setType('externalurl', PARAM_TEXT);
             $mform->addHelpButton('externalurl', 'externalurl', 'mediagallery');
-        } else if ($gallery->mode == 'thebox') {
-            if (empty($item->objectid)) {
-                $mform->addElement('uploader', 'content', get_string('content', 'mediagallery'), '0',
-                    array('maxfiles' => 1, 'return_types' => FILE_REFERENCE, 'repo' => 'thebox'));
+            $mform->disabledIf('externalurl', 'contenttype', 'eq', 'image');
+            $mform->disabledIf('externalurl', 'contenttype', 'eq', 'text');
+            if ($item) {
+                $mform->disabledIf('content', 'itemtype', 'neq', 3);
+            }
+
+        } else {
+            if ($gallery->mode == 'standard') {
+                $mform->addElement('uploader_standard', 'content', get_string('content', 'mediagallery'), '0',
+                    mediagallery_filepicker_options($gallery));
                 $mform->addHelpButton('content', 'content', 'mediagallery');
-            } else {
-                $mform->removeElement('filecheck');
-                $mform->addElement('static', 'contentlinked', get_string('content', 'mediagallery'),
-                    get_string('contentlinkedinfo', 'mediagallery', $item->get_file()->get_filename()));
-                $mform->addHelpButton('contentlinked', 'contentlinked', 'mediagallery');
+
+                $fpoptions = mediagallery_filepicker_options($gallery);
+                $fpoptions['accepted_types'] = array('web_image');
+                $fpoptions['return_types'] = FILE_INTERNAL;
+                $mform->addElement('filepicker', 'customthumbnail', get_string('thumbnail', 'mediagallery'), '0', $fpoptions);
+                $mform->addHelpButton('customthumbnail', 'thumbnail', 'mediagallery');
+            } else if ($gallery->mode == 'youtube') {
+                $mform->addElement('limitedurl', 'externalurl', get_string('youtubeurl', 'mediagallery'), array('size' => '60'),
+                    array('usefilepicker' => true, 'repo' => 'youtube'));
+                $mform->setType('externalurl', PARAM_TEXT);
+                $mform->addHelpButton('externalurl', 'externalurl', 'mediagallery');
+            } else if ($gallery->mode == 'thebox') {
+                if (empty($item->objectid)) {
+                    $mform->addElement('uploader', 'content', get_string('content', 'mediagallery'), '0',
+                        array('maxfiles' => 1, 'return_types' => FILE_REFERENCE, 'repo' => 'thebox'));
+                    $mform->addHelpButton('content', 'content', 'mediagallery');
+                } else {
+                    $mform->removeElement('filecheck');
+                    $mform->addElement('static', 'contentlinked', get_string('content', 'mediagallery'),
+                        get_string('contentlinkedinfo', 'mediagallery', $item->get_file()->get_filename()));
+                    $mform->addHelpButton('contentlinked', 'contentlinked', 'mediagallery');
+                }
             }
         }
 
         $lockfields = $item && !$item->user_can_edit() ? true : false;
-
-        mediagallery_add_tag_field($mform, $tags, false, !$lockfields);
+        if (!get_config('mediagallery', 'swipeonly')) {
+            mediagallery_add_tag_field($mform, $tags, false, !$lockfields);
+        }
 
         if ($lockfields) {
             $mform->hardFreeze('caption');
@@ -156,29 +232,35 @@ class mod_mediagallery_item_form extends moodleform {
         $info = isset($data['content']) ? file_get_draft_area_info($data['content']) : array('filecount' => 0);
         $url = isset($data['externalurl']) ? trim($data['externalurl']) : '';
 
-        if (empty($data['externalurl']) && $info['filecount'] == 0 && empty($data['objectid'])) {
-            $errors['filecheck'] = get_string('required');
-        } else if (!empty($url) && !preg_match('|^/|', $url)) {
-            // Links relative to server root are ok - no validation necessary.
-            if (preg_match('|^[a-z]+://|i', $url) or preg_match('|^https?:|i', $url) or preg_match('|^ftp:|i', $url)) {
-                // Normal URL.
-                if (!mediagallery_appears_valid_url($url)) {
-                    $errors['externalurl'] = get_string('invalidurl', 'url');
-                }
-            } else if (!preg_match('|^[a-z]+:|i', $url)) {
-                // The preg_match above has us skip general URI such as
-                // teamspeak, mailto, etc. - it may or may not work in all
-                // browsers. We do not validate these at all, sorry.
+        if (get_config('mediagallery', 'swipeonly')) {
+            if (empty($data['externalurl']) && empty($data['description']) && $info['filecount'] == 0) {
+                $errors['filecheck'] = get_string('required');
+            }
+        } else {
+            if (empty($data['externalurl']) && $info['filecount'] == 0 && empty($data['objectid'])) {
+                $errors['filecheck'] = get_string('required');
+            } else if (!empty($url) && !preg_match('|^/|', $url)) {
+                // Links relative to server root are ok - no validation necessary.
+                if (preg_match('|^[a-z]+://|i', $url) or preg_match('|^https?:|i', $url) or preg_match('|^ftp:|i', $url)) {
+                    // Normal URL.
+                    if (!mediagallery_appears_valid_url($url)) {
+                        $errors['externalurl'] = get_string('invalidurl', 'url');
+                    }
+                } else if (!preg_match('|^[a-z]+:|i', $url)) {
+                    // The preg_match above has us skip general URI such as
+                    // teamspeak, mailto, etc. - it may or may not work in all
+                    // browsers. We do not validate these at all, sorry.
 
-                // Invalid URI, we try to fix it by adding 'http://' prefix.
-                // Relative links are NOT allowed because we display the link on different pages!
-                require_once($CFG->dirroot."/mod/url/locallib.php");
-                if (!url_appears_valid_url('http://'.$url)) {
-                    $errors['externalurl'] = get_string('invalidurl', 'url');
+                    // Invalid URI, we try to fix it by adding 'http://' prefix.
+                    // Relative links are NOT allowed because we display the link on different pages!
+                    require_once($CFG->dirroot."/mod/url/locallib.php");
+                    if (!url_appears_valid_url('http://'.$url)) {
+                        $errors['externalurl'] = get_string('invalidurl', 'url');
+                    }
                 }
             }
+            return $errors;
         }
-        return $errors;
     }
 
 }

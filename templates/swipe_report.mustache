@@ -1,0 +1,114 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_mediagallery/swipe
+
+    Example context (json):
+    {
+    }
+}}
+
+<h1>{{{ galleryname }}}</h1>
+<div class="clearfix"></div>
+<a class="btn btn-secondary mb-2" href="{{{ reportdownloadurl }}}">
+    <i class="fa fa-download"></i>
+    {{#str}} downloadswipereport, mod_mediagallery {{/str}}
+</a>
+<div class="swipereport clearfix">
+    <div class="container-fluid">
+        <div class="row border-bottom border-top border-left border-right">
+            <div class="col-md-4 text-center heading p-2">
+                <h3>{{#str}}card, mod_mediagallery{{/str}}</h3>
+            </div>
+            <div class="col-md-2 text-center heading p-2">
+                <span class="dislike">
+                    <i class="fa fa-times fa-2x"></i>
+                </span>
+            </div>
+            <div class="col-md-2 text-center heading p-2">
+                <span class="like">
+                    <i class="fa fa-check fa-2x"></i>
+                </span>
+            </div>
+            <div class="col-md-4 text-center heading p-2">
+                <h3>{{#str}}comments, mod_mediagallery{{/str}}</h3>
+            </div>
+        </div>
+        {{#cards}}
+        <div class="row border-bottom border-left border-right">
+            <div class="col-md-4 text-center">
+                <div class="media-container card mb-2 mt-2 rounded ml-auto mr-auto"
+                    data-card-id="{{id}}"
+                    data-card-type="{{type}}"
+                    data-preload="{{preloadid}}"
+                    {{#isimage}} data-card-image="{{{ img }}}" {{/isimage}}
+                    {{#isvideo}} data-card-video="{{{ embed }}}" {{/isvideo}}
+                    style="width: 300px; min-height: 250px;"
+                >
+                    {{#isimage}}
+                    <div class="card-image" data-region="card-image w-100" style="background-image: url({{{ img}}}); height: 300px; background-size: cover">
+                    </div>
+                    {{/isimage}}
+                    {{#isvideo}}
+                    <div class="card-video d-flex align-items-center">
+                        <iframe width="382" data-region="card-video" {{#preload}} src="{{{ embed }}}" {{/preload}} height="225" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+                        </iframe>
+                    </div>
+                    {{/isvideo}}
+                    {{#istext}}
+                        <div class="card-text text-center">
+                            <div class="inner">
+                                {{{ text }}}
+                            </div>
+                        </div>
+                    {{/istext}}
+                </div>
+            </div>
+            <div class="col-md-2 text-center">
+                <h3>{{{like.dislikes}}}</h3>
+            </div>
+            <div class="col-md-2 text-center">
+                <h3>{{{like.likes}}}</h3>
+            </div>
+            <div class="col-md-4">
+                {{#comments}}
+                    <div class="media border-bottom my-1 p-2">
+                        {{{avatar}}}
+                        <div class="media-body">
+                            <span class="name">{{fullname}}</span> <span class="text-muted small">{{time}}</span>
+                            <div class="pt-2">{{{content}}}</div>
+                        </div>
+                    </div>
+                {{/comments}}
+            </div>
+        </div>
+        {{/cards}}
+    </div>
+
+    {{#canedit}}
+    <div class="d-flex my-2 justify-content-center">
+        <a href="{{{ editurl }}}" class="btn btn-default">Edit cards</a>
+    </div>
+    {{/canedit}}
+
+</div>
+{{#js}}
+require(['jquery', 'mod_mediagallery/swipe_wrapper'], function($, Swipe) {
+    var root = '#mediagallery-slider';
+    Swipe.init(root);
+});
+{{/js}}

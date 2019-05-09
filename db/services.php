@@ -15,19 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * jQuery plugin list
+ * File description.
  *
- * @package    mod_mediagallery
- * @copyright  NetSpot Pty Ltd
- * @author     Adam Olley <adam.olley@netspot.com.au>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_mediagallery
+ * @copyright 2019 Bas Brands <bas@sonsbeekmedia.nl>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugins = array(
-    'jcarousel' => array('files' => array(
-            'jcarousel/jquery.jcarousel.v2.min.js',
-        )
-    )
+$functions = array(
+
+    'mod_mediagallery_like' => array(
+        'classpath' => 'mod/mediagallery/classes/external.php',
+        'classname'   => 'mod_mediagallery_external',
+        'methodname'  => 'like',
+        'description' => 'Like an item.',
+        'type'        => 'read',
+        'ajax'        => true,
+        'services'    => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
 );
+
