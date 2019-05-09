@@ -90,20 +90,34 @@ class mod_mediagallery_gallery_form extends moodleform {
             }
         }
 
-        // Mode. Normal or YT.
-        $opts = array(
-            'standard' => get_string('modestandard', 'mod_mediagallery'),
-            'youtube' => get_string('modeyoutube', 'mod_mediagallery'),
-        );
-        if (get_config('mediagallery', 'disablestandardgallery') || $mg->mode != 'standard') {
-            unset($opts['standard']);
-        }
-        $mform->addElement('select', 'mode', get_string('mode', 'mod_mediagallery'), $opts);
-        $mform->addHelpButton('mode', 'mode', 'mediagallery');
+        $config = get_config('mediagallery');
+        $swipeonly = !empty($config->swipeonly);
 
-        if ($mg->colltype != 'instructor') {
-            $mform->addElement('checkbox', 'contributable', get_string('contributable', 'mod_mediagallery'));
-            $mform->addHelpButton('contributable', 'contributable', 'mediagallery');
+        // Mode. Normal or YT.
+        if (!$swipeonly) {
+            $opts = array(
+                'standard' => get_string('modestandard', 'mod_mediagallery'),
+                'youtube' => get_string('modeyoutube', 'mod_mediagallery'),
+            );
+            if (get_config('mediagallery', 'disablestandardgallery') || $mg->mode != 'standard') {
+                unset($opts['standard']);
+            }
+            $mform->addElement('select', 'mode', get_string('mode', 'mod_mediagallery'), $opts);
+            $mform->addHelpButton('mode', 'mode', 'mediagallery');
+
+            if ($mg->colltype != 'instructor') {
+                $mform->addElement('checkbox', 'contributable', get_string('contributable', 'mod_mediagallery'));
+                $mform->addHelpButton('contributable', 'contributable', 'mediagallery');
+            }
+        } else {
+            $mform->addElement('hidden', 'mode', 'standard');
+            $mform->setType('mode', PARAM_ALPHA);
+
+            $mform->addElement('hidden', 'galleryfocus', 3);
+            $mform->setType('galleryfocus', PARAM_INT);
+
+            $mform->addElement('editor', 'endofdeck', get_string('endofdeck', 'mediagallery'));
+            $mform->setType('agents', PARAM_RAW);
         }
 
         mediagallery_add_tag_field($mform, $tags, false, !$lockfields);
@@ -113,77 +127,78 @@ class mod_mediagallery_gallery_form extends moodleform {
             $mform->hardFreeze('tags');
         }
 
-        // Gallery settings.
-        $mform->addElement('header', 'display', get_string('settingsgallerydisplay', 'mediagallery'));
+        if (!$swipeonly) {
+            // Gallery settings.
+            $mform->addElement('header', 'display', get_string('settingsgallerydisplay', 'mediagallery'));
 
-        $options = array(
-            \mod_mediagallery\base::TYPE_ALL => get_string('typeall', 'mediagallery'),
-            \mod_mediagallery\base::TYPE_IMAGE => get_string('typeimage', 'mediagallery'),
-            \mod_mediagallery\base::TYPE_VIDEO => get_string('typevideo', 'mediagallery'),
-            \mod_mediagallery\base::TYPE_AUDIO => get_string('typeaudio', 'mediagallery'),
-        );
-        $mform->addElement('select', 'galleryfocus', get_string('galleryfocus', 'mediagallery'), $options);
-        $mform->addHelpButton('galleryfocus', 'galleryfocus', 'mediagallery');
-        $mform->setDefault('galleryfocus', $mg->galleryfocus);
-        $mform->disabledIf('galleryfocus', 'mode', 'eq', 'youtube');
-        if ($mg->enforcedefaults) {
-            $mform->hardFreeze('galleryfocus');
-        }
-
-        $options = array();
-        if ($mg->grid) {
-            $options[gallery::VIEW_GRID] = get_string('gridview', 'mediagallery');
-        }
-        if ($mg->carousel) {
-            $options[gallery::VIEW_CAROUSEL] = get_string('carousel', 'mediagallery');
-        }
-
-        $mform->addElement('select', 'galleryview', get_string('galleryviewoptions', 'mediagallery'), $options);
-        if ($mg->enforcedefaults && !($mg->grid && $mg->carousel)) {
-            $default = $mg->grid ? gallery::VIEW_GRID : gallery::VIEW_CAROUSEL;
-            $mform->setDefault('galleryview', $default);
-            $mform->hardFreeze('galleryview');
-        }
-
-        if (!$mg->enforcedefaults) {
-            if (isset($options[gallery::VIEW_GRID])) {
-                $coloptions = array(0 => get_string('automatic', 'mediagallery'), 1 => 1, 2 => 2, 3 => 3, 4 => 4);
-                $mform->addElement('select', 'gridcolumns', get_string('gridviewcolumns', 'mediagallery'), $coloptions);
-                $mform->disabledIf('gridcolumns', 'galleryview', 'ne', gallery::VIEW_GRID);
-                $mform->setDefault('gridcolumns', $mg->gridcolumns);
-
-                $rowoptions = array(0 => get_string('automatic', 'mediagallery'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5,
-                    6 => 6, 7 => 7, 8 => 8, 9 => 9, 10 => 10);
-                $mform->addElement('select', 'gridrows', get_string('gridviewrows', 'mediagallery'), $rowoptions);
-                $mform->disabledIf('gridrows', 'galleryview', 'ne', gallery::VIEW_GRID);
-                $mform->setDefault('gridrows', $mg->gridrows);
+            $options = array(
+                \mod_mediagallery\base::TYPE_ALL => get_string('typeall', 'mediagallery'),
+                \mod_mediagallery\base::TYPE_IMAGE => get_string('typeimage', 'mediagallery'),
+                \mod_mediagallery\base::TYPE_VIDEO => get_string('typevideo', 'mediagallery'),
+                \mod_mediagallery\base::TYPE_AUDIO => get_string('typeaudio', 'mediagallery'),
+            );
+            $mform->addElement('select', 'galleryfocus', get_string('galleryfocus', 'mediagallery'), $options);
+            $mform->addHelpButton('galleryfocus', 'galleryfocus', 'mediagallery');
+            $mform->setDefault('galleryfocus', $mg->galleryfocus);
+            $mform->disabledIf('galleryfocus', 'mode', 'eq', 'youtube');
+            if ($mg->enforcedefaults) {
+                $mform->hardFreeze('galleryfocus');
             }
-        } else {
+
+            $options = array();
             if ($mg->grid) {
-                $mform->addElement('static', 'gridcolumns', get_string('gridviewcolumns', 'mediagallery'), $mg->gridcolumns);
-                $mform->addElement('static', 'gridrows', get_string('gridviewrows', 'mediagallery'), $mg->gridrows);
+                $options[gallery::VIEW_GRID] = get_string('gridview', 'mediagallery');
             }
+            if ($mg->carousel) {
+                $options[gallery::VIEW_CAROUSEL] = get_string('carousel', 'mediagallery');
+            }
+
+            $mform->addElement('select', 'galleryview', get_string('galleryviewoptions', 'mediagallery'), $options);
+            if ($mg->enforcedefaults && !($mg->grid && $mg->carousel)) {
+                $default = $mg->grid ? gallery::VIEW_GRID : gallery::VIEW_CAROUSEL;
+                $mform->setDefault('galleryview', $default);
+                $mform->hardFreeze('galleryview');
+            }
+
+            if (!$mg->enforcedefaults) {
+                if (isset($options[gallery::VIEW_GRID])) {
+                    $coloptions = array(0 => get_string('automatic', 'mediagallery'), 1 => 1, 2 => 2, 3 => 3, 4 => 4);
+                    $mform->addElement('select', 'gridcolumns', get_string('gridviewcolumns', 'mediagallery'), $coloptions);
+                    $mform->disabledIf('gridcolumns', 'galleryview', 'ne', gallery::VIEW_GRID);
+                    $mform->setDefault('gridcolumns', $mg->gridcolumns);
+
+                    $rowoptions = array(0 => get_string('automatic', 'mediagallery'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5,
+                        6 => 6, 7 => 7, 8 => 8, 9 => 9, 10 => 10);
+                    $mform->addElement('select', 'gridrows', get_string('gridviewrows', 'mediagallery'), $rowoptions);
+                    $mform->disabledIf('gridrows', 'galleryview', 'ne', gallery::VIEW_GRID);
+                    $mform->setDefault('gridrows', $mg->gridrows);
+                }
+            } else {
+                if ($mg->grid) {
+                    $mform->addElement('static', 'gridcolumns', get_string('gridviewcolumns', 'mediagallery'), $mg->gridcolumns);
+                    $mform->addElement('static', 'gridrows', get_string('gridviewrows', 'mediagallery'), $mg->gridrows);
+                }
+            }
+            $mform->addHelpButton('galleryview', 'galleryviewoptions', 'mediagallery');
+            if ($mg->grid) {
+                $mform->addHelpButton('gridcolumns', 'gridviewcolumns', 'mediagallery');
+                $mform->addHelpButton('gridrows', 'gridviewrows', 'mediagallery');
+            }
+
+            // Visibility settings.
+            $mform->addElement('header', 'display', get_string('settingsvisibility', 'mediagallery'));
+
+            $mform->addElement('date_time_selector', 'visibleinstructor',
+                get_string('visibleinstructor', 'mediagallery'),
+                array('optional' => true));
+            $mform->addHelpButton('visibleinstructor', 'visibleinstructor', 'mediagallery');
+
+            $mform->addElement('date_time_selector', 'visibleother',
+                get_string('visibleother', 'mediagallery'),
+                array('optional' => true));
+            $mform->addHelpButton('visibleother', 'visibleother', 'mediagallery');
+            $mform->setDefault('visibleother', time());
         }
-        $mform->addHelpButton('galleryview', 'galleryviewoptions', 'mediagallery');
-        if ($mg->grid) {
-            $mform->addHelpButton('gridcolumns', 'gridviewcolumns', 'mediagallery');
-            $mform->addHelpButton('gridrows', 'gridviewrows', 'mediagallery');
-        }
-
-        // Visibility settings.
-        $mform->addElement('header', 'display', get_string('settingsvisibility', 'mediagallery'));
-
-        $mform->addElement('date_time_selector', 'visibleinstructor',
-            get_string('visibleinstructor', 'mediagallery'),
-            array('optional' => true));
-        $mform->addHelpButton('visibleinstructor', 'visibleinstructor', 'mediagallery');
-
-        $mform->addElement('date_time_selector', 'visibleother',
-            get_string('visibleother', 'mediagallery'),
-            array('optional' => true));
-        $mform->addHelpButton('visibleother', 'visibleother', 'mediagallery');
-        $mform->setDefault('visibleother', time());
-
         $mform->addElement('hidden', 'm', $mg->id);
         $mform->setType('m', PARAM_INT);
 

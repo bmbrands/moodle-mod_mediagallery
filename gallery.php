@@ -74,6 +74,10 @@ $mform = new mod_mediagallery_gallery_form(null, array('mediagallery' => $mediag
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/mod/mediagallery/view.php', array('m' => $mediagallery->id, 'editing' => 1)));
 } else if ($data = $mform->get_data()) {
+    // For a swipe deck store the last card info in the agent DB field.
+    if (isset($data->endofdeck)) {
+        $data->agents = $data->endofdeck['text'];
+    }
     if (!isset($data->contributable) || $mediagallery->colltype == 'instructor') {
         $data->contributable = 0;
     }
@@ -104,6 +108,10 @@ if ($mform->is_cancelled()) {
         print_error('nopermissions', 'error', $pageurl, 'edit gallery');
     }
     $data = $gallery->get_record();
+    if (isset($data->agents)) {
+        $data->endofdeck['text'] = $data->agents;
+        $data->endofdeck['format'] = 1;
+    }
     $data->tags = $gallery->get_tags();
     foreach ($gallery->get_display_settings() as $key => $value) {
         $data->$key = $value;

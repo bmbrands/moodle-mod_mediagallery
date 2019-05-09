@@ -34,7 +34,6 @@ require_once(dirname(__FILE__).'/classes/gallery.php');
 require_once(dirname(__FILE__).'/classes/item.php');
 require_once(dirname(__FILE__).'/classes/imagehelper.php');
 require_once($CFG->dirroot.'/comment/lib.php');
-require_once($CFG->libdir.'/coursecatlib.php');
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->dirroot.'/repository/lib.php');
 require_once($CFG->dirroot.'/tag/lib.php');
@@ -351,7 +350,7 @@ function mediagallery_generate_search_sql($parsetree) {
 function mediagallery_add_metainfo_fields(&$mform) {
     $mform->addElement('selectyesno', 'moralrights', get_string('moralrights', 'mediagallery'));
     $mform->addHelpButton('moralrights', 'moralrights', 'mediagallery');
-    $mform->setDefault('moralrights', 1);
+    $mform->setDefault('moralrights', 0);
 
     $mform->addElement('text', 'originalauthor', get_string('originalauthor', 'mediagallery'));
     $mform->setType('originalauthor', PARAM_TEXT);

@@ -37,6 +37,10 @@ if ($ADMIN->fulltree) {
                         new lang_string('disablestandardgallery', 'mediagallery'),
                         new lang_string('configdisablestandardgallery', 'mediagallery'), 0));
 
+    $settings->add(new admin_setting_configcheckbox('mediagallery/swipeonly',
+                        new lang_string('swipeonly', 'mediagallery'),
+                        new lang_string('configswipeonly', 'mediagallery'), 1));
+
 }
 if ($hassiteconfig) {
     $ADMIN->add('reports', new admin_externalpage('modmediagallerystorage',

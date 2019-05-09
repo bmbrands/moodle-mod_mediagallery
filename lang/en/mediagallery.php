@@ -129,6 +129,7 @@ $string['deleteorremoveitemwarn'] = 'By deleting you acknowledge you are:<br/>
 - deleting the media item from theBox<br/>
 - disabling all links made in other courses to this media item';
 $string['disablestandardgallery'] = 'Disable standard galleries';
+$string['swipeonly'] = 'Only allow swiping for users';
 $string['displayfullcaption'] = 'Display full caption text';
 $string['download'] = 'Download';
 $string['editgallery'] = 'Edit gallery';
@@ -145,29 +146,29 @@ $string['errortheboxunavailable'] = 'Sorry, it looks like theBox is unavailable 
 $string['errortoomanyitems'] = 'Sorry, this gallery already has the maximum number of items allowed ({$a}).';
 $string['errortoomanygalleries'] = 'Sorry, you or your group has exceeded the maximum number of galleries allowed in this collection ({$a}).';
 $string['eventcollectiondeleted'] = 'Collection deleted';
-$string['eventgallerycreated'] = 'Gallery created';
-$string['eventgallerydeleted'] = 'Gallery deleted';
-$string['eventgalleryupdated'] = 'Gallery updated';
+$string['eventgallerycreated'] = 'Swipe created';
+$string['eventgallerydeleted'] = 'Swipe deleted';
+$string['eventgalleryupdated'] = 'Swipe updated';
 $string['eventitemcreated'] = 'Item created';
 $string['eventitemdeleted'] = 'Item deleted';
 $string['eventitemupdated'] = 'Item updated';
-$string['eventgalleryviewed'] = 'Gallery viewed';
+$string['eventgalleryviewed'] = 'Swipe viewed';
 $string['exifmissing'] = 'Without this, jpg/tiff files may not be rotated to the correct orientation in media collections.';
 $string['export'] = 'Export';
 $string['exportascsv'] = 'Export as CSV';
 $string['exportgallery'] = 'Export gallery';
 $string['externalurl'] = 'External URL';
-$string['externalurl_help'] = 'Currently links to images and youtube videos are supported.';
+$string['externalurl_help'] = 'Currently links to images and videos are supported.';
 $string['filename'] = 'File name';
 $string['filesize'] = 'File size';
 $string['foundxresults'] = 'Found {$a} result(s):';
-$string['gallery'] = 'Gallery';
-$string['galleryfocus'] = 'Gallery focus';
-$string['galleryfocus_help'] = 'The default focus of the gallery (determines what filetypes are presented as the focus of the gallery). If set as a YouTube gallery, the focus is locked to Video.';
-$string['galleryname'] = 'Gallery name';
+$string['gallery'] = 'Swipe';
+$string['galleryfocus'] = 'Swipe focus';
+$string['galleryfocus_help'] = 'The default focus of the gallery (determines what filetypes are presented as the focus of the gallery). If set as a video swipe, the focus is locked to Video.';
+$string['galleryname'] = 'Swipe name';
 $string['gallerythumbnail'] = 'Use as thumbnail';
 $string['gallerythumbnail_help'] = 'If selected, the thumbnail for this item is used as the thumbnail for the gallery.';
-$string['galleryviewoptions'] = 'Gallery view options';
+$string['galleryviewoptions'] = 'Swipe view options';
 $string['galleryviewoptions_help'] = 'Determines the gallery view options which are available to students.';
 $string['gridview'] = 'Grid view';
 $string['gridviewcolumns'] = 'Columns in grid view';
@@ -193,25 +194,25 @@ $string['maxitems_help'] = 'The maximum number of items a user can put in a gall
 Note: for Instructor collections, this is always unlimited.';
 $string['maxitemsreached'] = 'Maximum number of items added';
 $string['mediatype'] = 'Media type';
-$string['modulename'] = 'Media collection';
-$string['modulenameplural'] = 'Media collections';
-$string['modulename_help'] = 'Use the Media collection module for creating galleries of media content.
+$string['modulename'] = 'Swipe';
+$string['modulenameplural'] = 'Swipes';
+$string['modulename_help'] = 'Use the Swipe module for creating galleries of media content.
 
 Users can create their own galleries of images, video or audio either on their own or in groups.
 
 
 Uploaded content will be presented in either a carousel or grid format as thumbnails. Click on any of the thumbnails brings that image into focus and allows you to browse through the gallery. Users are able to \'like\' and comment on content they can see in their own and other galleries.';
-$string['mediagallery:addinstance'] = 'Add an instance of Media collection';
+$string['mediagallery:addinstance'] = 'Add an instance of Swipe';
 $string['mediagallery:comment'] = 'Comment on a media collection gallery or item';
 $string['mediagallery:grade'] = 'Grade media gallery';
 $string['mediagallery:like'] = 'Ability to like items in a media collection';
-$string['mediagallery:manage'] = 'Manage an instance of Media collection';
-$string['mediagallery:viewall'] = 'Ability to view all galleries in a Media collection';
+$string['mediagallery:manage'] = 'Manage an instance of Swipe';
+$string['mediagallery:viewall'] = 'Ability to view all galleries in a Swipe';
 
 $string['mediagalleryfieldset'] = 'Custom example fieldset';
-$string['mediagalleryname'] = 'Media collection name';
+$string['mediagalleryname'] = 'Swipe name';
 $string['mediagalleryname_help'] = 'The name you want to give your media collection.';
-$string['mediagallery'] = 'Media collection';
+$string['mediagallery'] = 'Swipe';
 $string['mediainformation'] = 'Media information';
 $string['mediasize'] = 'Media size';
 $string['mediasizesm'] = 'Small';
@@ -220,14 +221,14 @@ $string['mediasizelg'] = 'Large';
 $string['medium'] = 'Medium';
 $string['medium_help'] = 'The medium used to create the work (i.e. painting, photography, sound, etc).';
 $string['metainfobulkheader'] = 'The below values will be used as the initial metadata for each of the items added above.';
-$string['mode'] = 'Gallery mode';
+$string['mode'] = 'Swipe mode';
 $string['mode_help'] = 'This defines the kind of content the gallery supports. Once set, this value cannot be changed.
 
 <ul><li>Standard: in this mode, users can add any kind of media content they wish.</li>
-<li>YouTube: in this mode, only youtube videos can be added to the gallery.</li></ul>';
+<li>Video: in this mode, only youtube videos can be added to the gallery.</li></ul>';
 $string['modestandard'] = 'Standard';
 $string['modethebox'] = 'theBox';
-$string['modeyoutube'] = 'YouTube';
+$string['modeyoutube'] = 'Video';
 $string['moralrights'] = 'Moral rights';
 $string['moralrights_help'] = 'Do you wish to assert your moral rights?
 
@@ -240,8 +241,8 @@ $string['originalauthor_help'] = 'The original author of the item.';
 $string['other'] = 'other';
 $string['otherfiles'] = 'Other files';
 $string['others'] = 'others';
-$string['pluginadministration'] = 'Media collection administration';
-$string['pluginname'] = 'Media collection';
+$string['pluginadministration'] = 'Swipe administration';
+$string['pluginname'] = 'Swipe';
 $string['privacy:metadata:core_comments'] = 'Comments associated with media collection galleries or items';
 $string['privacy:metadata:core_files'] = 'Tags associated with media collection galleries or items';
 $string['privacy:metadata:core_tag'] = 'Tags associated with media collection galleries or items';
@@ -296,14 +297,14 @@ $string['searchcourseonly'] = 'Only this course';
 $string['searchcourseonly_help'] = 'Did you only want to search for items in media galleries withing this course?';
 $string['searchdisplayxtoyofzresults'] = 'Found {$a->total} result(s). Displaying {$a->from}-{$a->to}:';
 $string['searchresults'] = 'Search results';
-$string['searchtitle'] = 'Media collection search';
+$string['searchtitle'] = 'Swipe search';
 $string['selection'] = 'Selection';
 $string['settingsavailability'] = 'Availability';
 $string['settingsdisplay'] = 'Display list';
-$string['settingsgallery'] = 'Gallery defaults';
-$string['settingsgallerydisplay'] = 'Gallery display';
+$string['settingsgallery'] = 'Swipe defaults';
+$string['settingsgallerydisplay'] = 'Swipe display';
 $string['settingsvisibility'] = 'Visibility';
-$string['storagereport'] = 'Media collection storage';
+$string['storagereport'] = 'Swipe storage';
 $string['storagetotalusage'] = 'Total storage usage across the site: {$a}.';
 $string['submittedforgrading'] = 'Submitted for grading';
 $string['showall'] = 'Show all';
@@ -334,4 +335,27 @@ $string['visibleother'] = 'Visible to everyone in the course after';
 $string['visibleother_help'] = 'Define the gallery as visible to other users after the specified date. Course managers with appropriate permissions will always be able to see the gallery.';
 $string['you'] = 'you';
 $string['youmusttypedelete'] = 'You must type DELETE to confirm deletion.';
-$string['youtubeurl'] = 'YouTube URL';
+$string['youtubeurl'] = 'Video URL';
+
+// Strings for swiping functionality
+$string['card'] = 'Card';
+$string['liked'] = 'Liked';
+$string['disliked'] = 'Disliked';
+$string['comments'] = 'Comments';
+$string['configswipeonly'] = 'Simple media gallery with only swiping.';
+$string['contenttype'] = 'Content type';
+$string['contenttype_image'] = 'Image';
+$string['contenttype_text'] = 'Text';
+$string['contenttype_video'] = 'Video';
+$string['image-video-text'] = 'Add text, image or video';
+$string['notenoughcards'] = 'Please add more cards to this swipe deck';
+$string['pluginname'] = 'Media swipe';
+$string['editswipesettings'] = 'Edit swipe deck';
+$string['viewswipereport'] = 'View swipe report';
+$string['endofdeck'] = 'End of deck message';
+$string['viewswipe'] = 'View swipe deck';
+$string['downloadswipereport'] = 'Download report';
+$string['feedback'] = 'Send us some feedback!';
+$string['enterfeedback'] = 'Enter your feedback here';
+$string['sendfeedback'] = 'Send feedback';
+$string['thankyou'] = 'Feedback received, thank you!';

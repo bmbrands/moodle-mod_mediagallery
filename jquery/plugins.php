@@ -29,5 +29,5 @@ $plugins = array(
     'jcarousel' => array('files' => array(
             'jcarousel/jquery.jcarousel.v2.min.js',
         )
-    ),
+    )
 );
