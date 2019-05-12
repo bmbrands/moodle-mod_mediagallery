@@ -103,7 +103,7 @@ class mod_mediagallery_item_form extends moodleform {
                 'image' => get_string('contenttype_image', 'mediagallery'),
                 'video' => get_string('contenttype_video', 'mediagallery')
             );
-            
+
             if ($item) {
                 if ($type == 1) {
                     $mform->addElement('hidden', 'contenttype', 'image');

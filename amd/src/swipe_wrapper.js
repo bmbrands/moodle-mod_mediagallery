@@ -109,6 +109,7 @@ function(
         root.on(CustomEvents.events.activate, SELECTORS.VIEW_COMMENTS, function(e, data) {
             var cardid = getCardId(root);
             var commentarea = $('#comment-area' + cardid);
+            commentarea.find('.comment-ctrl').css('display', 'block');
             commentarea.removeClass('hidden');
             data.originalEvent.preventDefault();
         });
@@ -153,13 +154,18 @@ function(
             var iframe = card.find('iframe');
             if ( iframe.length ) {
                 var video = iframe.attr('src');
-                iframe.attr('src','');
-                iframe.attr('src',video);
+                iframe.attr('src', '');
+                iframe.attr('src', video);
             }
         }
 
         // Prepare the next cards on the deck.
         var preloadid = card.attr('data-preload');
+
+        if (card.attr('data-last')) {
+            $(SELECTORS.ACTION_CONTAINER).addClass('disabled');
+            console.log('this was the last card');
+        }
 
         if (preloadid) {
             preloadCard = getCard(root, preloadid);

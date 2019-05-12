@@ -1091,7 +1091,7 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
             $card->id = $item->id;
             $card->like = $item->get_like_info();
 
-            if (isset($card->like->rated)) {
+            if (isset($card->like->rated) && !$showagain) {
                 continue;
             }
 
@@ -1134,6 +1134,7 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
             $template->cards[0]->preload = true;
             $template->cards[1]->preload = true;
         }
+        $template->cards[0]->last = true;
 
         return $this->render_from_template('mod_mediagallery/swipe', $template);
     }

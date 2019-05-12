@@ -680,11 +680,10 @@ body.mediaboxactive .gallery .mediaplugin object {
   font-size: 2rem;
   text-align: center;
   height: 420px;
-  width: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow-y: scroll; }
+  overflow-y: auto; }
 
 .swipelike #tinderslide {
   position: relative;
@@ -779,7 +778,6 @@ body.mediaboxactive .gallery .mediaplugin object {
     background-color: #FFF; }
 
 .swipelike .cardactions {
-  width: 400px;
   margin: 0 auto;
   overflow: hidden; }
 
@@ -833,6 +831,10 @@ body.mediaboxactive .gallery .mediaplugin object {
     text-decoration: none;
     color: #555;
     background: #f5f5f5; }
+
+.swipelike .cardactions.disabled a {
+  cursor: not-allowed;
+  opacity: 0.5; }
 
 .swipelike .cardactions a.small {
   width: 60px;

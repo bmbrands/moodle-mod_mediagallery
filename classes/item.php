@@ -157,7 +157,7 @@ class item extends base {
             $data->display = 1;
 
             $metafields = array(
-                'moralrights' => 1,
+                'moralrights' => 0,
                 'originalauthor' => '',
                 'productiondate' => 0,
                 'medium' => '',
