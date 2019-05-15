@@ -680,6 +680,7 @@ body.mediaboxactive .gallery .mediaplugin object {
   font-size: 2rem;
   text-align: center;
   height: 420px;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -753,8 +754,9 @@ body.mediaboxactive .gallery .mediaplugin object {
   .swipelike #tinderslide .card-image {
     height: 350px;
     width: 100%;
-    background-size: cover;
+    background-size: contain;
     background-repeat: no-repeat;
+    background-position: center center;
     margin-bottom: 10px;
     position: relative; }
   .swipelike #tinderslide .card-video {
@@ -776,6 +778,8 @@ body.mediaboxactive .gallery .mediaplugin object {
     color: #6c757d;
     padding: 0.5rem;
     background-color: #FFF; }
+    .swipelike #tinderslide .card-footer .likes {
+      min-width: 30px; }
 
 .swipelike .cardactions {
   margin: 0 auto;
@@ -863,3 +867,9 @@ body.mediaboxactive .gallery .mediaplugin object {
 
 .swipereport .like i {
   color: #86BD97; }
+
+.path-mod-mediagallery .gthumbnail {
+  overflow: hidden; }
+
+.path-mod-mediagallery .icon-nomargin i {
+  margin-right: 0; }

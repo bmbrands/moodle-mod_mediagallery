@@ -611,7 +611,15 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
         global $USER;
         $o = html_writer::start_tag('div', array('class' => 'item', 'data-id' => $item->id, 'data-title' => $item->caption));
 
-        $img = html_writer::empty_tag('img', array('src' => $item->get_image_url_by_type('thumbnail')));
+        $type = $item->type();
+
+        if ($type == mcbase::TYPE_IMAGE) {
+            $img = html_writer::empty_tag('img', array('src' => $item->get_image_url_by_type('thumbnail')));
+        } else if ($type == mcbase::TYPE_VIDEO) {
+            $img = html_writer::tag('div', get_string('contenttype_video', 'mod_mediagallery'), array('class' => 'alert alert-info'));
+        } else {
+           $img = html_writer::tag('div', $item->description, array('class' => 'text-center'));
+        }
         $link = html_writer::link(null, $img);
         $o .= html_writer::tag('div', $link, array('class' => 'gthumbnail'));
         $o .= html_writer::start_tag('div', array('class' => 'title'));
@@ -1050,7 +1058,7 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
      * @param array $options
      * @return string
      */
-    public function view_cards(gallery $gallery) {
+    public function view_cards(gallery $gallery, $context) {
 
         $template = new stdClass();
         $template->modurl = new moodle_url('/mod/mediagallery/img/');
@@ -1059,6 +1067,7 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
         $template->endofdeck = $gallery->agents;
         $template->canedit = $gallery->user_can_edit();
         $template->editurl = new moodle_url('/mod/mediagallery/view.php', array('g' => $gallery->id, 'editing' => 1));
+
         $template->cards = [];
 
         $showagain = optional_param('showagain', 0, PARAM_INT);
@@ -1091,8 +1100,10 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
             $card->id = $item->id;
             $card->like = $item->get_like_info();
 
-            if (isset($card->like->rated) && !$showagain) {
-                continue;
+            if (!has_capability('mod/mediagallery:grade', $context)) {
+                if (isset($card->like->rated) && !$showagain) {
+                    continue;
+                }
             }
 
             if (count($previous) >= 2) {
@@ -1101,7 +1112,7 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
 
             if ($type == mcbase::TYPE_IMAGE) {
                 $card->isimage = true;
-                $card->img = $item->get_image_url_by_type('thumbnail');
+                $card->img = $item->get_image_url_by_type('item');
                 $card->caption = $item->caption;
                 $card->itemhtml = $this->embed_html($item);
             } else if ($type == mcbase::TYPE_VIDEO) {
@@ -1134,7 +1145,9 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
             $template->cards[0]->preload = true;
             $template->cards[1]->preload = true;
         }
-        $template->cards[0]->last = true;
+        if ($count > 0) {
+            $template->cards[0]->last = true;
+        }
 
         return $this->render_from_template('mod_mediagallery/swipe', $template);
     }
@@ -1147,6 +1160,70 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
 
         $context = $gallery->get_collection()->context;
 
+        $sort = optional_param('sort', 'cardsasc', PARAM_ALPHA);
+
+        $sortparams = ['g' => $gallery->id, 'page' => 'report'];
+        switch ($sort) {
+            case 'cardsasc':
+                $template->sortcards = true;
+                $template->asc = true;
+                $sortparams['sort'] = 'carddesc';
+                break;
+            case 'carddesc':
+                $template->sortcards = true;
+                $template->desc = true;
+                $sortparams['sort'] = 'cardsasc';
+                break;
+            case 'dislikeasc':
+                $template->sortdislike = true;
+                $template->asc = true;
+                $sortparams['sort'] = 'dislikedesc';
+                break;
+            case 'dislikedesc':
+                $template->sortdislike = true;
+                $template->desc = true;
+                $sortparams['sort'] = 'dislikeasc';
+                break;
+            case 'likeasc':
+                $template->sortlike = true;
+                $template->asc = true;
+                $sortparams['sort'] = 'likedesc';
+                break;
+            case 'likedesc':
+                $template->sortlike = true;
+                $template->desc = true;
+                $sortparams['sort'] = 'likeasc';
+                break;
+            case 'commentasc':
+                $template->sortcomment = true;
+                $template->asc = true;
+                $sortparams['sort'] = 'commentdesc';
+                break;
+            case 'commentdesc':
+                $template->sortcomment = true;
+                $template->desc = true;
+                $sortparams['sort'] = 'commentasc';
+                break;
+            }
+
+        $lsort = $sortparams;
+        $lsort['sort'] = 'carddesc';
+        $template->sortcardsurl = new moodle_url('/mod/mediagallery/swipe.php', $lsort);
+
+        $lsort['sort'] = 'dislikedesc';
+        $template->sortdislikeurl = new moodle_url('/mod/mediagallery/swipe.php', $lsort);
+
+        $lsort['sort'] = 'likedesc';
+        $template->sortlikeurl = new moodle_url('/mod/mediagallery/swipe.php', $lsort);
+
+        $lsort['sort'] = 'commentdesc';
+        $template->sortcommenturl = new moodle_url('/mod/mediagallery/swipe.php', $lsort);
+
+        $template->sortdir = new moodle_url('/mod/mediagallery/swipe.php', $sortparams);
+
+        $sortcards = $sortdislike = $sortlike = $sortcomments = $cardlist = $names = [];
+
+        $count = 0;
         foreach ($gallerycards as $item) {
 
             $type = $item->type();
@@ -1176,8 +1253,45 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
             }
             $comments = $this->comment_for_card($card->id, $context);
             $card->comments = $comments->get_comments();
-            $template->cards[] = $card;
+
+            $cardlist[$count] = $card;
+            $sortdislike[$count] = $card->like->dislikes;
+            $sortlike[$count] = $card->like->likes;
+            $names[$count] = $item->caption;
+            $sortcomments[$count] = count($card->comments);
+
+            $count++;
         }
+
+        if (!empty($cardlist)) {
+            switch ($sort) {
+                case 'cardsasc':
+                    //do nothing
+                    break;
+                case 'carddesc':
+                    $cardlist = array_reverse($cardlist);
+                    break;
+                case 'dislikeasc':
+                    array_multisort($sortdislike, SORT_ASC, $names, SORT_ASC, $cardlist);
+                    break;
+                case 'dislikedesc':
+                    array_multisort($sortdislike, SORT_DESC, $names, SORT_ASC, $cardlist);
+                    break;
+                case 'likeasc':
+                    array_multisort($sortlike, SORT_ASC, $names, SORT_ASC, $cardlist);
+                    break;
+                case 'likedesc':
+                    array_multisort($sortlike, SORT_DESC, $names, SORT_ASC, $cardlist);
+                    break;
+                case 'commentasc':
+                    array_multisort($sortcomments, SORT_ASC, $names, SORT_ASC, $cardlist);
+                    break;
+                case 'commentdesc':
+                    array_multisort($sortcomments, SORT_DESC, $names, SORT_ASC, $cardlist);
+                    break;
+            }
+        }
+        $template->cards = $cardlist;
 
         return $this->render_from_template('mod_mediagallery/swipe_report', $template);
     }

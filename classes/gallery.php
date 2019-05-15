@@ -45,6 +45,7 @@ class gallery extends base {
             || !has_capability('mod/mediagallery:comment', $this->get_context())) {
             $can = false;
         }
+        return true;
         return $can;
     }
 

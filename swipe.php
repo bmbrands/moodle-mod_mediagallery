@@ -73,7 +73,7 @@ if ($page === 'report') {
 	}
 } else {
 
-	echo $renderer->view_cards($gallery);
+	echo $renderer->view_cards($gallery, $context);
 }
 echo $OUTPUT->footer();
 

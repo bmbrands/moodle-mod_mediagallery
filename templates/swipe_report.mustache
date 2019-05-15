@@ -32,20 +32,68 @@
     <div class="container-fluid">
         <div class="row border-bottom border-top border-left border-right">
             <div class="col-md-4 text-center heading p-2">
-                <h3>{{#str}}card, mod_mediagallery{{/str}}</h3>
+                <div class="d-flex justify-content-center align-items-center">
+                {{#sortcards}}
+                    <h3>{{#str}}card, mod_mediagallery{{/str}}</h3>
+                    {{< mod_mediagallery/sort_icons }}
+                        {{$sort}}{{#str}} card, mod_mediagallery {{/str}}{{/sort}}
+                    {{/ mod_mediagallery/sort_icons }}
+                {{/sortcards}}
+                {{^sortcards}}
+                <a class="h3" href="{{{ sortcardsurl }}}">
+                    {{#str}}card, mod_mediagallery{{/str}}
+                </a>
+                {{/sortcards}}
+                </div>
             </div>
             <div class="col-md-2 text-center heading p-2">
-                <span class="dislike">
-                    <i class="fa fa-times fa-2x"></i>
-                </span>
+                <div class="d-flex justify-content-center align-items-center">
+                {{#sortdislike}}
+                    <span class="dislike">
+                        <i class="fa fa-times fa-2x"></i>
+                    </span>
+                    {{< mod_mediagallery/sort_icons }}
+                        {{$sort}}{{#str}} disliked, mod_mediagallery {{/str}}{{/sort}}
+                    {{/ mod_mediagallery/sort_icons }}
+                {{/sortdislike}}
+                {{^sortdislike}}
+                    <a class="dislike" href="{{{ sortdislikeurl }}}">
+                        <i class="fa fa-times fa-2x"></i>
+                    </a>
+                {{/sortdislike}}
+                </div>
             </div>
             <div class="col-md-2 text-center heading p-2">
-                <span class="like">
-                    <i class="fa fa-check fa-2x"></i>
-                </span>
+                <div class="d-flex justify-content-center align-items-center">
+                {{#sortlike}}
+                    <span class="like">
+                        <i class="fa fa-check fa-2x"></i>
+                    </span>
+                    {{< mod_mediagallery/sort_icons }}
+                        {{$sort}}{{#str}} liked, mod_mediagallery {{/str}}{{/sort}}
+                    {{/ mod_mediagallery/sort_icons }}
+                {{/sortlike}}
+                {{^sortlike}}
+                    <a class="like" href="{{{ sortlikeurl }}}">
+                        <i class="fa fa-check fa-2x"></i>
+                    </a>
+                {{/sortlike}}
+                </div>
             </div>
             <div class="col-md-4 text-center heading p-2">
-                <h3>{{#str}}comments, mod_mediagallery{{/str}}</h3>
+                <div class="d-flex justify-content-center align-items-center">
+                {{#sortcomment}}
+                    <h3>{{#str}}comments, mod_mediagallery{{/str}}</h3>
+                    {{< mod_mediagallery/sort_icons }}
+                        {{$sort}}{{#str}} comments, mod_mediagallery {{/str}}{{/sort}}
+                    {{/ mod_mediagallery/sort_icons }}
+                {{/sortcomment}}
+                {{^sortcomment}}
+                    <a class="h3" href="{{{ sortcommenturl }}}">
+                        {{#str}}comments, mod_mediagallery{{/str}}
+                    </a>
+                {{/sortcomment}}
+                </div>
             </div>
         </div>
         {{#cards}}

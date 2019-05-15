@@ -714,6 +714,11 @@ class item extends base {
                 if (!empty($value)) {
                     $dislikedcards = json_decode($value);
                 }
+            } else {
+                if (isset($_COOKIE['rated'])) {
+                    $SESSION->dislikedcards = $_COOKIE['rated'];
+                    $dislikedcards = json_decode($_COOKIE['rated']);
+                }
             }
             $likedcards = [];
             if (isset($SESSION->likedcards)) {
@@ -731,11 +736,10 @@ class item extends base {
             }
         }
 
+        $info->likes = $DB->count_records('mediagallery_userfeedback', array('itemid' => $this->record->id, 'liked' => 1));
+        $info->dislikes = $DB->count_records('mediagallery_userfeedback', array('itemid' => $this->record->id, 'liked' => 0));
+        $info->likedbyme = false;
         if ($this->gallery->can_like()) {
-            $info->likes = $DB->count_records('mediagallery_userfeedback', array('itemid' => $this->record->id, 'liked' => 1));
-            $info->dislikes = $DB->count_records('mediagallery_userfeedback', array('itemid' => $this->record->id, 'liked' => 0));
-            $info->likedbyme = false;
-
             if ($fb = $this->get_userfeedback()) {
                 $info->rated = true;
                 if ($fb->liked) {
@@ -804,8 +808,21 @@ class item extends base {
         return null;
     }
 
+    private function store_cookie_rated($id) {
+        $rated = [];
+        if (isset($_COOKIE['rated'])) {
+            $rated = json_decode($_COOKIE['rated']);
+        }
+        $rated[] = $id;
+        setcookie('rated', json_encode($rated), time() + (86400 * 30), "/");
+    }
+
     public function like() {
         global $DB, $USER, $SESSION;
+
+        if (has_capability('mod/mediagallery:grade', $this->get_context())) {
+            return false;
+        }
 
         $context = $this->get_context();
         if (is_guest($context)) {
@@ -819,6 +836,16 @@ class item extends base {
             $likedcards[] = $this->record->id;
             $cookievalue = json_encode($likedcards);
             $SESSION->likedcards = $cookievalue;
+            $fb = (object) array(
+                'itemid' => $this->record->id,
+                'userid' => $USER->id,
+                'liked' => 1,
+            );
+            $DB->insert_record('mediagallery_userfeedback', $fb);
+
+            // Also store in cookie for later reference.
+            $this->store_cookie_rated($this->record->id);
+            return true;
         }
         if (!has_capability('mod/mediagallery:like', $this->get_context())) {
             return false;
@@ -889,6 +916,10 @@ class item extends base {
     public function unlike() {
         global $DB, $USER, $SESSION;
 
+        if (has_capability('mod/mediagallery:grade', $this->get_context())) {
+            return false;
+        }
+
         $context = $this->get_context();
         if (is_guest($context)) {
             $dislikedcards = [];
@@ -902,10 +933,14 @@ class item extends base {
             $cookievalue = json_encode($dislikedcards);
             $SESSION->dislikedcards =  $cookievalue;
 
-            global $CFG;
-            $fh = fopen($CFG->dataroot . '/temp/unlikecookie.txt', 'w');
-            fwrite($fh, print_r($SESSION, true));
-            fclose($fh);
+            $fb = (object) array(
+                'itemid' => $this->record->id,
+                'userid' => $USER->id,
+                'liked' => 0,
+            );
+            $DB->insert_record('mediagallery_userfeedback', $fb);
+            $this->store_cookie_rated($this->record->id);
+            return true;
         }
 
         if (!has_capability('mod/mediagallery:like', $this->get_context())) {

@@ -29,7 +29,8 @@ define(
     'core/notification',
     'core/ajax',
     'mod_mediagallery/transform',
-    'mod_mediagallery/tinder'
+    'mod_mediagallery/tinder',
+    'mod_mediagallery/textFit'
 ],
 function(
     $,
@@ -37,7 +38,8 @@ function(
     Notification,
     Ajax,
     transform_unused,
-    jTinder
+    jTinder,
+    textFit
 ) {
     var SELECTORS = {
         VIEW_COMMENTS: '[data-action="view-comments"]',
@@ -164,7 +166,6 @@ function(
 
         if (card.attr('data-last')) {
             $(SELECTORS.ACTION_CONTAINER).addClass('disabled');
-            console.log('this was the last card');
         }
 
         if (preloadid) {
@@ -189,7 +190,8 @@ function(
      * @param {Object} options
      */
     var init = function(root) {
-        var root = $(root)
+        var root = $(root);
+        textFit(document.getElementsByClassName('innertext'), {multiLine: true});
         $("#tinderslide").jTinder({
             // dislike callback
             onDislike: function (item) {
