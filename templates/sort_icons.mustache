@@ -25,7 +25,7 @@
 }}
 <div class="sorticons ml-2">
     {{#asc}}
-        <span class="btn btn-outline-secondary btn-sm rounded disabled icon-nomargin">
+        <span class="btn btn-primary btn-sm rounded disabled icon-nomargin">
         {{#pix}} t/sort_asc, core {{/pix}}
         </span>
     {{/asc}}
@@ -33,13 +33,13 @@
         <a href="{{{sortdir}}}"
             data-toggle="tooltip"
             data-placement="top"
-            class="btn btn-secondary btn-sm rounded icon-nomargin"
+            class="btn btn-outline-primary btn-sm rounded icon-nomargin"
             title="{{#str}} sortbyx, core, {{$sort}}{{/sort}} {{/str}}">
             {{#pix}} t/sort_asc, core {{/pix}}
         </a>
     {{/asc}}
     {{#desc}}
-        <span class="btn btn-outline-secondary btn-sm rounded disabled icon-nomargin">
+        <span class="btn btn-primary btn-sm rounded disabled icon-nomargin">
         {{#pix}} t/sort_desc, core {{/pix}}
     </span>
     {{/desc}}
@@ -47,7 +47,7 @@
         <a href="{{{sortdir}}}"
             data-toggle="tooltip"
             data-placement="bottom"
-            class="btn btn-secondary btn-sm rounded icon-nomargin"
+            class="btn btn-outline-primary btn-sm rounded icon-nomargin"
             title="{{#str}} sortbyxreverse, core, {{$sort}}{{/sort}} {{/str}}">
             {{#pix}} t/sort_desc, core {{/pix}}
         </a>
