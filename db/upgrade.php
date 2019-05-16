@@ -443,5 +443,21 @@ function xmldb_mediagallery_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2015082600, 'mediagallery');
     }
 
+    if ($oldversion < 2019051501) {
+
+        // Define index itemid-userid (unique) to be dropped form mediagallery_userfeedback.
+        $table = new xmldb_table('mediagallery_userfeedback');
+        $index = new xmldb_index('itemid-userid', XMLDB_INDEX_UNIQUE, array('itemid', 'userid'));
+
+        // Conditionally launch drop index itemid-userid.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Mediagallery savepoint reached.
+        upgrade_mod_savepoint(true, 2019051501, 'mediagallery');
+    }
+
+
     return true;
 }

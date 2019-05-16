@@ -28,7 +28,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2019051500;
+$plugin->version   = 2019051501;
 $plugin->requires  = 2018050800;
 $plugin->cron      = 0;
 $plugin->component = 'mod_mediagallery';

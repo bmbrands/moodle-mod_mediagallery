@@ -841,11 +841,20 @@ class item extends base {
                 'userid' => $USER->id,
                 'liked' => 1,
             );
+            // global $CFG;
+            // $fh = fopen($CFG->dataroot . '/temp/lala.txt', 'a');
+            // fwrite($fh, print_r($fb, true));
+            // fclose($fh);
             $DB->insert_record('mediagallery_userfeedback', $fb);
 
             // Also store in cookie for later reference.
             $this->store_cookie_rated($this->record->id);
-            return true;
+            return false;
+        } else {
+            global $CFG;
+            $fh = fopen($CFG->dataroot . '/temp/notguest.txt', 'a');
+            fwrite($fh, 'not');
+            fclose($fh);
         }
         if (!has_capability('mod/mediagallery:like', $this->get_context())) {
             return false;
