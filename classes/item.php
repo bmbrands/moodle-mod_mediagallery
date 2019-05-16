@@ -830,7 +830,7 @@ class item extends base {
             if (isset($SESSION->likedcards)) {
                 $value = clean_param($SESSION->likedcards, PARAM_RAW);
                 if (!empty($value)) {
-                    $likedcards = json_decode($value);
+                    $likedcards = is_array(json_decode($value)) ? json_decode($value) : [];
                 }
             }
             $likedcards[] = $this->record->id;
@@ -926,7 +926,7 @@ class item extends base {
             if (isset($SESSION->dislikedcards)) {
                 $value = clean_param($SESSION->dislikedcards, PARAM_RAW);
                 if (!empty($value)) {
-                    $dislikedcards = json_decode($value);
+                    $dislikedcards = is_array(json_decode($value)) ? json_decode($value) : [];
                 }
             }
             $dislikedcards[] = $this->record->id;
