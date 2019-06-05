@@ -779,7 +779,7 @@ class item extends base {
             $cmtopt->displaycancel = true;
             $cmtopt->component = 'mod_mediagallery';
             $cmtopt->autostart = true;
-            $comment = new \comment($cmtopt);
+            $comment = new mediacomment($cmtopt);
             $info->commentcontrol = $comment->output(true);
             preg_match('#comment-link-([\w]+)#', $info->commentcontrol, $matches);
             $info->client_id = isset($matches[1]) ? $matches[1] : null;

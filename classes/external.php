@@ -102,4 +102,72 @@ class mod_mediagallery_external extends external_api {
             )
         );
     }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     * @since Moodle 3.6
+     */
+    public static function feedback_parameters() {
+        return new external_function_parameters([
+            'galleryid' => new external_value(PARAM_INT, 'gallery id', VALUE_DEFAULT, 0),
+            'feedback' => new external_value(PARAM_RAW, 'The feedback text')
+        ]);
+    }
+
+    /**
+     * Add gallery feedback.
+     *
+     * @param int $galleryid Gallery id
+     * @param str $feedback The feedback text
+     *
+     * @return  array list of courses and warnings
+     */
+    public static function feedback($galleryid, $feedback) {
+
+        $params = self::validate_parameters(self::feedback_parameters(), [
+            'galleryid' => $galleryid,
+            'feedback' => $feedback
+        ]);
+
+        $warnings = array();
+
+        try {
+            $gallery = new \mod_mediagallery\gallery($galleryid);
+            if ($feedback) {
+                $gallery->store_feedback($feedback);
+            }
+        } catch (Exception $e) {
+            $warning = array();
+            $warning['item'] = 'mediagallery';
+            $warning['itemid'] = $galleryid;
+            if ($e instanceof moodle_exception) {
+                $warning['warningcode'] = $e->errorcode;
+            } else {
+                $warning['warningcode'] = $e->getCode();
+            }
+            $warning['message'] = $e->getMessage();
+            $warnings[] = $warning;
+        }
+
+        $result = array();
+        $result['warnings'] = $warnings;
+        return $result;
+    }
+
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     * @since Moodle 3.6
+     */
+    public static function feedback_returns() {
+        return new external_single_structure(
+            array(
+                'warnings' => new external_warnings()
+            )
+        );
+    }
+
 }

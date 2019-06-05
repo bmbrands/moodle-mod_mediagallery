@@ -67,13 +67,19 @@ if ($page === 'exportxls') {
 
 echo $OUTPUT->header(null, true);
 
+if ($page === 'storefeedback') {
+    $gallery->store_feedback('FOOP!');
+} else {
+
 if ($page === 'report') {
 	if (has_capability('mod/mediagallery:grade', $context)) {
 		echo $renderer->view_cards_report($gallery, array('filter' => true));
 	}
 } else {
-
 	echo $renderer->view_cards($gallery, $context);
 }
+
+}
+
 echo $OUTPUT->footer();
 

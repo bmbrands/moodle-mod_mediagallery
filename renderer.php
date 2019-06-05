@@ -1063,6 +1063,7 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
         $template = new stdClass();
         $template->modurl = new moodle_url('/mod/mediagallery/img/');
         $template->type = $gallery->type(true);
+        $template->galleryid = $gallery->id;
         $template->galleryname = $gallery->name;
         $template->endofdeck = $gallery->agents;
         $template->canedit = $gallery->user_can_edit();
@@ -1194,16 +1195,6 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
                 $template->desc = true;
                 $sortparams['sort'] = 'likeasc';
                 break;
-            case 'commentasc':
-                $template->sortcomment = true;
-                $template->asc = true;
-                $sortparams['sort'] = 'commentdesc';
-                break;
-            case 'commentdesc':
-                $template->sortcomment = true;
-                $template->desc = true;
-                $sortparams['sort'] = 'commentasc';
-                break;
             }
 
         $lsort = $sortparams;
@@ -1216,12 +1207,9 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
         $lsort['sort'] = 'likedesc';
         $template->sortlikeurl = new moodle_url('/mod/mediagallery/swipe.php', $lsort);
 
-        $lsort['sort'] = 'commentdesc';
-        $template->sortcommenturl = new moodle_url('/mod/mediagallery/swipe.php', $lsort);
-
         $template->sortdir = new moodle_url('/mod/mediagallery/swipe.php', $sortparams);
 
-        $sortcards = $sortdislike = $sortlike = $sortcomments = $cardlist = $names = [];
+        $sortcards = $sortdislike = $sortlike = $cardlist = $names = [];
 
         $count = 0;
         foreach ($gallerycards as $item) {
@@ -1251,14 +1239,11 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
                 $card->text = $item->description;
                 $card->caption = $item->caption;
             }
-            $comments = $this->comment_for_card($card->id, $context);
-            $card->comments = $comments->get_comments();
 
             $cardlist[$count] = $card;
             $sortdislike[$count] = $card->like->dislikes;
             $sortlike[$count] = $card->like->likes;
             $names[$count] = $item->caption;
-            $sortcomments[$count] = count($card->comments);
 
             $count++;
         }
@@ -1283,15 +1268,10 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
                 case 'likedesc':
                     array_multisort($sortlike, SORT_DESC, $names, SORT_ASC, $cardlist);
                     break;
-                case 'commentasc':
-                    array_multisort($sortcomments, SORT_ASC, $names, SORT_ASC, $cardlist);
-                    break;
-                case 'commentdesc':
-                    array_multisort($sortcomments, SORT_DESC, $names, SORT_ASC, $cardlist);
-                    break;
             }
         }
         $template->cards = $cardlist;
+        $template->comments = $this->comments_for_gallery($gallery->id);
 
         return $this->render_from_template('mod_mediagallery/swipe_report', $template);
     }
@@ -1332,7 +1312,6 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
         $myxls->write_string(0, 0, get_string('card', 'mod_mediagallery'), array('bold' => 1, 'size' => 16));
         $myxls->write_string(0, 1, get_string('disliked', 'mod_mediagallery'), array('bold' => 1, 'color' => '#EB6E5A', 'size' => 16));
         $myxls->write_string(0, 2, get_string('liked', 'mod_mediagallery'), array('bold' => 1, 'color' => '#86BD97', 'size' => 16));
-        $myxls->write_string(0, 3, get_string('comments', 'mod_mediagallery'), array('bold' => 1, 'size' => 16));
         $myxls->set_row(0, 20);
 
         $row = 1;
@@ -1368,13 +1347,6 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
             $myxls->write_string($row, 2, $like->likes,
                 array('v_align' => 'top', 'color' => '#86BD97', 'size' => 15));
 
-            // Write the comments
-            $comments = $this->comment_for_card($item->id, $context);
-            $cardcomments = $comments->get_comments();
-            $commenttext = '';
-            foreach ($cardcomments as $cc) {
-                $commenttext .= strip_tags($cc->fullname) . ': ' . strip_tags($cc->content) . "\n";
-            }
             $myxls->write_string($row, 3, $commenttext,
                 array('v_align' => 'top'));
 
@@ -1390,22 +1362,26 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
      * @param int $cardid
      * @return comment
      */
-    public static function comment_for_card($cardid, $context) {
-        $options = new stdClass;
-        $options->area          = 'item';
-        $options->context       = $context;
-        $options->itemid        = $cardid;
-        $options->component     = 'mod_mediagallery';
-        $options->showcount     = true;
-        $options->notoggle      = true;
-        $options->autostart     = true;
-        $options->displaycancel = true;
-        $options->ignore_permission = true;
+    public static function comments_for_gallery($galleryid) {
+        global $DB, $OUTPUT;
+        $ufields = user_picture::fields('u');
 
-        $api = new comment($options);
-        $api->set_fullwidth();
+        $sql = "SELECT c.id AS cid, $ufields, c.feedback AS feedback, c.timecreated AS feedbackcreated
+                  FROM {mediagallery_swipefeedback} c
+                  JOIN {user} u ON u.id = c.userid
+                 WHERE c.galleryid = :galleryid
+              ORDER BY c.timecreated DESC";
+        $params['galleryid'] = $galleryid;
 
-        return $api;
+        $comments = $DB->get_records_sql($sql, $params);
+
+        if (count($comments)) {
+            foreach ($comments as &$comment) {
+                $comment->name = fullname($comment);
+                $comment->avatar = $OUTPUT->user_picture($comment, array('size'=>18));
+            }
+        }
+        return array_values($comments);
     }
 }
 

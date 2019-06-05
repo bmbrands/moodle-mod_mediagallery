@@ -30,121 +30,117 @@
 </a>
 <div class="swipereport clearfix">
     <div class="container-fluid">
-        <div class="row border-bottom border-top border-left border-right">
-            <div class="col-md-4 text-center heading p-2">
-                <div class="d-flex justify-content-center align-items-center">
-                {{#sortcards}}
-                    <h3>{{#str}}card, mod_mediagallery{{/str}}</h3>
-                    {{< mod_mediagallery/sort_icons }}
-                        {{$sort}}{{#str}} card, mod_mediagallery {{/str}}{{/sort}}
-                    {{/ mod_mediagallery/sort_icons }}
-                {{/sortcards}}
-                {{^sortcards}}
-                <a class="h3" href="{{{ sortcardsurl }}}">
-                    {{#str}}card, mod_mediagallery{{/str}}
-                </a>
-                {{/sortcards}}
-                </div>
-            </div>
-            <div class="col-md-2 text-center heading p-2">
-                <div class="d-flex justify-content-center align-items-center">
-                {{#sortdislike}}
-                    <span class="dislike">
-                        <i class="fa fa-times fa-2x"></i>
-                    </span>
-                    {{< mod_mediagallery/sort_icons }}
-                        {{$sort}}{{#str}} disliked, mod_mediagallery {{/str}}{{/sort}}
-                    {{/ mod_mediagallery/sort_icons }}
-                {{/sortdislike}}
-                {{^sortdislike}}
-                    <a class="dislike" href="{{{ sortdislikeurl }}}">
-                        <i class="fa fa-times fa-2x"></i>
-                    </a>
-                {{/sortdislike}}
-                </div>
-            </div>
-            <div class="col-md-2 text-center heading p-2">
-                <div class="d-flex justify-content-center align-items-center">
-                {{#sortlike}}
-                    <span class="like">
-                        <i class="fa fa-check fa-2x"></i>
-                    </span>
-                    {{< mod_mediagallery/sort_icons }}
-                        {{$sort}}{{#str}} liked, mod_mediagallery {{/str}}{{/sort}}
-                    {{/ mod_mediagallery/sort_icons }}
-                {{/sortlike}}
-                {{^sortlike}}
-                    <a class="like" href="{{{ sortlikeurl }}}">
-                        <i class="fa fa-check fa-2x"></i>
-                    </a>
-                {{/sortlike}}
-                </div>
-            </div>
-            <div class="col-md-4 text-center heading p-2">
-                <div class="d-flex justify-content-center align-items-center">
-                {{#sortcomment}}
-                    <h3>{{#str}}comments, mod_mediagallery{{/str}}</h3>
-                    {{< mod_mediagallery/sort_icons }}
-                        {{$sort}}{{#str}} comments, mod_mediagallery {{/str}}{{/sort}}
-                    {{/ mod_mediagallery/sort_icons }}
-                {{/sortcomment}}
-                {{^sortcomment}}
-                    <a class="h3" href="{{{ sortcommenturl }}}">
-                        {{#str}}comments, mod_mediagallery{{/str}}
-                    </a>
-                {{/sortcomment}}
-                </div>
-            </div>
-        </div>
-        {{#cards}}
-        <div class="row border-bottom border-left border-right">
-            <div class="col-md-4 text-center">
-                <div class="media-container card mb-2 mt-2 rounded ml-auto mr-auto"
-                    data-card-id="{{id}}"
-                    data-card-type="{{type}}"
-                    data-preload="{{preloadid}}"
-                    {{#isimage}} data-card-image="{{{ img }}}" {{/isimage}}
-                    {{#isvideo}} data-card-video="{{{ embed }}}" {{/isvideo}}
-                    style="width: 300px; min-height: 250px;"
-                >
-                    {{#isimage}}
-                    <div class="card-image" data-region="card-image w-100" style="background-image: url({{{ img}}}); height: 300px; background-size: cover">
-                    </div>
-                    {{/isimage}}
-                    {{#isvideo}}
-                    <div class="card-video d-flex align-items-center">
-                        <iframe width="382" data-region="card-video" {{#preload}} src="{{{ embed }}}" {{/preload}} height="225" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
-                        </iframe>
-                    </div>
-                    {{/isvideo}}
-                    {{#istext}}
-                        <div class="card-text text-center">
-                            <div class="inner">
-                                {{{ text }}}
+        <div class="row">
+            <div class="col-12 col-md-9">
+                <div class="container-fluid">
+                    <div class="row border-bottom border-top border-left border-right">
+                        <div class="col-md-6 text-center heading p-2">
+                            <div class="d-flex justify-content-center align-items-center">
+                            {{#sortcards}}
+                                <h3>{{#str}}card, mod_mediagallery{{/str}}</h3>
+                                {{< mod_mediagallery/sort_icons }}
+                                    {{$sort}}{{#str}} card, mod_mediagallery {{/str}}{{/sort}}
+                                {{/ mod_mediagallery/sort_icons }}
+                            {{/sortcards}}
+                            {{^sortcards}}
+                            <a class="h3" href="{{{ sortcardsurl }}}">
+                                {{#str}}card, mod_mediagallery{{/str}}
+                            </a>
+                            {{/sortcards}}
                             </div>
                         </div>
-                    {{/istext}}
-                </div>
-            </div>
-            <div class="col-md-2 text-center">
-                <h3>{{{like.dislikes}}}</h3>
-            </div>
-            <div class="col-md-2 text-center">
-                <h3>{{{like.likes}}}</h3>
-            </div>
-            <div class="col-md-4">
-                {{#comments}}
-                    <div class="media border-bottom my-1 p-2">
-                        {{{avatar}}}
-                        <div class="media-body">
-                            <span class="name">{{fullname}}</span> <span class="text-muted small">{{time}}</span>
-                            <div class="pt-2">{{{content}}}</div>
+                        <div class="col-md-3 text-center heading p-2">
+                            <div class="d-flex justify-content-center align-items-center">
+                            {{#sortdislike}}
+                                <span class="dislike">
+                                    <i class="fa fa-times fa-2x"></i>
+                                </span>
+                                {{< mod_mediagallery/sort_icons }}
+                                    {{$sort}}{{#str}} disliked, mod_mediagallery {{/str}}{{/sort}}
+                                {{/ mod_mediagallery/sort_icons }}
+                            {{/sortdislike}}
+                            {{^sortdislike}}
+                                <a class="dislike" href="{{{ sortdislikeurl }}}">
+                                    <i class="fa fa-times fa-2x"></i>
+                                </a>
+                            {{/sortdislike}}
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center heading p-2">
+                            <div class="d-flex justify-content-center align-items-center">
+                            {{#sortlike}}
+                                <span class="like">
+                                    <i class="fa fa-check fa-2x"></i>
+                                </span>
+                                {{< mod_mediagallery/sort_icons }}
+                                    {{$sort}}{{#str}} liked, mod_mediagallery {{/str}}{{/sort}}
+                                {{/ mod_mediagallery/sort_icons }}
+                            {{/sortlike}}
+                            {{^sortlike}}
+                                <a class="like" href="{{{ sortlikeurl }}}">
+                                    <i class="fa fa-check fa-2x"></i>
+                                </a>
+                            {{/sortlike}}
+                            </div>
                         </div>
                     </div>
+                    {{#cards}}
+                    <div class="row border-bottom border-left border-right">
+                        <div class="col-md-6 text-center">
+                            <div class="media-container card mb-2 mt-2 rounded ml-auto mr-auto"
+                                data-card-id="{{id}}"
+                                data-card-type="{{type}}"
+                                data-preload="{{preloadid}}"
+                                {{#isimage}} data-card-image="{{{ img }}}" {{/isimage}}
+                                {{#isvideo}} data-card-video="{{{ embed }}}" {{/isvideo}}
+                                style="width: 300px; min-height: 250px;"
+                            >
+                                {{#isimage}}
+                                <div class="card-image" data-region="card-image w-100" style="background-image: url({{{ img}}}); height: 300px; background-size: cover">
+                                </div>
+                                {{/isimage}}
+                                {{#isvideo}}
+                                <div class="card-video d-flex align-items-center">
+                                    <iframe width="382" data-region="card-video" {{#preload}} src="{{{ embed }}}" {{/preload}} height="225" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+                                    </iframe>
+                                </div>
+                                {{/isvideo}}
+                                {{#istext}}
+                                    <div class="card-text text-center">
+                                        <div class="inner">
+                                            {{{ text }}}
+                                        </div>
+                                    </div>
+                                {{/istext}}
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h3>{{{like.dislikes}}}</h3>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h3>{{{like.likes}}}</h3>
+                        </div>
+                    </div>
+                    {{/cards}}
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <h3>{{#str}}comments, mod_mediagallery{{/str}}</h3>
+                <div class="list-group">
+                {{#comments}}
+                    <div class="w-100 list-group-item">
+                        <div class="d-flex mb-2">
+                            <div>{{name}}</div>
+                            <div class="ml-auto muted">
+                                {{#userdate}} {{feedbackcreated}}, {{#str}} strftimedatefullshort, core_langconfig  {{/str}} {{/userdate}}
+                            </div>
+                        </div>
+                        <p class="bg-light p-1 m-0">{{feedback}}</p>
+                    </div>
                 {{/comments}}
+                </div>
             </div>
         </div>
-        {{/cards}}
     </div>
 
     {{#canedit}}

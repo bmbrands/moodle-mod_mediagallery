@@ -162,15 +162,16 @@ class mod_mediagallery_mod_form extends moodleform_mod {
             $mform->addHelpButton('maxgalleries', 'maxgalleries', 'mediagallery');
             $mform->disabledIf('maxgalleries', 'colltype', 'eq', 'instructor');
             $mform->disabledIf('maxgalleries', 'colltype', 'eq', 'single');
-        }
-
-        if ($CFG->usecomments) {
-            $mform->addElement('selectyesno', 'allowcomments', get_string('allowcomments', 'mediagallery'));
-            $mform->setDefault('allowcomments', 1);
-            $mform->addHelpButton('allowcomments', 'allowcomments', 'mediagallery');
+            if ($CFG->usecomments) {
+                $mform->addElement('selectyesno', 'allowcomments', get_string('allowcomments', 'mediagallery'));
+                $mform->setDefault('allowcomments', 1);
+                $mform->addHelpButton('allowcomments', 'allowcomments', 'mediagallery');
+            }
         }
 
         if ($swipeonly) {
+            $mform->addElement('hidden', 'allowcomments', 0);
+            $mform->setType('allowcomments', PARAM_INT);
             $mform->addElement('hidden', 'allowlikes', 1);
             $mform->setType('allowlikes', PARAM_INT);
         } else {

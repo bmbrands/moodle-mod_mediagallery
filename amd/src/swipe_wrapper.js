@@ -42,7 +42,6 @@ function(
     textFit
 ) {
     var SELECTORS = {
-        VIEW_COMMENTS: '[data-action="view-comments"]',
         LIKE: '[data-action="like"]',
         DISLIKE: '[data-action="dislike"]',
         VIEW_INFO: '[data-action="info"]',
@@ -50,7 +49,12 @@ function(
         ACTION_CONTAINER: '[data-region="cardactions"]',
         INFO_CONTAINER: '[data-region="card-info"]',
         CARD_IMAGE: '[data-region="card-image"]',
-        CARD_VIDEO: '[data-region="card-video"]'
+        CARD_VIDEO: '[data-region="card-video"]',
+        FEEDBACK_CONTAINER: '[data-region="feedback-container"]',
+        FEEDBACK_INPUT: '[data-region="feedback-input"]',
+        FEEDBACK_SEND: '[data-action="send-feedback"]',
+        FEEDBACK_THANKS: '[data-region="feedback-thanks"]',
+        FEEDBACK_TEXT: '[data-region="feedback-text"]'
     };
 
     var TYPE = {
@@ -60,7 +64,6 @@ function(
     }
 
     var storeLike = function(itemid, like) {
-
         var args = {
             itemid : itemid,
             like: like
@@ -72,6 +75,20 @@ function(
         var promise = Ajax.call([request])[0];
         promise.fail(Notification.exception);
 
+        return promise;
+    };
+
+    var storeFeedback = function(galleryid, feedback) {
+        var args = {
+            galleryid : galleryid,
+            feedback: feedback
+        };
+        var request = {
+            methodname: 'mod_mediagallery_feedback',
+            args: args
+        };
+        var promise = Ajax.call([request])[0];
+        promise.fail(Notification.exception);
         return promise;
     };
 
@@ -108,14 +125,6 @@ function(
 
         CustomEvents.define(root, [CustomEvents.events.activate]);
 
-        root.on(CustomEvents.events.activate, SELECTORS.VIEW_COMMENTS, function(e, data) {
-            var cardid = getCardId(root);
-            var commentarea = $('#comment-area' + cardid);
-            commentarea.find('.comment-ctrl').css('display', 'block');
-            commentarea.removeClass('hidden');
-            data.originalEvent.preventDefault();
-        });
-
         root.on(CustomEvents.events.activate, SELECTORS.VIEW_INFO, function(e, data) {
             var cardid = getCardId(root);
             var card = getCard(root, cardid);
@@ -141,6 +150,22 @@ function(
             $("#tinderslide").jTinder('dislike');
             data.originalEvent.preventDefault();
         });
+
+        root.on(CustomEvents.events.activate, SELECTORS.FEEDBACK_SEND, function (e, data) {
+            var fbContainer = root.find(SELECTORS.FEEDBACK_CONTAINER);
+            var fbInput = fbContainer.find(SELECTORS.FEEDBACK_INPUT);
+            var fbText = fbContainer.find(SELECTORS.FEEDBACK_TEXT);
+            var fbThanks = fbContainer.find(SELECTORS.FEEDBACK_THANKS);
+            var galleryid = fbContainer.attr('data-galleryid');
+            var feedback = fbText.val();
+
+            storeFeedback(galleryid, feedback).then( function() {
+                fbInput.addClass('hidden');
+                fbThanks.removeClass('hidden');
+            })
+
+            data.originalEvent.preventDefault();
+        })
     }
 
     var nextCardActions = function(root, cardid) {
@@ -165,7 +190,8 @@ function(
         var preloadid = card.attr('data-preload');
 
         if (card.attr('data-last')) {
-            $(SELECTORS.ACTION_CONTAINER).addClass('disabled');
+            root.find(SELECTORS.ACTION_CONTAINER).addClass('disabled');
+            root.find(SELECTORS.FEEDBACK_CONTAINER).removeClass('hidden');
         }
 
         if (preloadid) {

@@ -458,6 +458,31 @@ function xmldb_mediagallery_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019051501, 'mediagallery');
     }
 
+    if ($oldversion < 2019060500) {
+
+        // Define table mediagallery_swipefeedback to be created.
+        $table = new xmldb_table('mediagallery_swipefeedback');
+
+        // Adding fields to table mediagallery_swipefeedback.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('galleryid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('feedback', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys to table mediagallery_swipefeedback.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for mediagallery_swipefeedback.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Mediagallery savepoint reached.
+        upgrade_mod_savepoint(true, 2019060500, 'mediagallery');
+    }
+
+
 
     return true;
 }

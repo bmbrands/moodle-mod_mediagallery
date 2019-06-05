@@ -355,3 +355,7 @@ $string['viewswipereport'] = 'View swipe report';
 $string['endofdeck'] = 'End of deck message';
 $string['viewswipe'] = 'View swipe deck';
 $string['downloadswipereport'] = 'Download report';
+$string['feedback'] = 'Send us some feedback!';
+$string['enterfeedback'] = 'Enter your feedback here';
+$string['sendfeedback'] = 'Send feedback';
+$string['thankyou'] = 'Feedback received, thank you!';

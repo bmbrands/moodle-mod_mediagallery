@@ -35,5 +35,14 @@ $functions = array(
         'ajax'        => true,
         'services'    => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
+    'mod_mediagallery_feedback' => array(
+        'classpath' => 'mod/mediagallery/classes/external.php',
+        'classname'   => 'mod_mediagallery_external',
+        'methodname'  => 'feedback',
+        'description' => 'Send feedback for a swipe deck.',
+        'type'        => 'write',
+        'ajax'        => true,
+        'services'    => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
 );
 

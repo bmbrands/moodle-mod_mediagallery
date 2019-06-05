@@ -40,12 +40,15 @@ class gallery extends base {
 
     public function can_comment() {
         global $CFG;
+        $config = get_config('mediagallery');
+        if (!empty($config->swipeonly)) {
+            return false;
+        }
         $can = true;
         if (!$CFG->usecomments || !$this->get_collection()->allowcomments
             || !has_capability('mod/mediagallery:comment', $this->get_context())) {
             $can = false;
         }
-        return true;
         return $can;
     }
 
@@ -529,5 +532,16 @@ class gallery extends base {
         }
 
         return false;
+    }
+
+    public function store_feedback($text) {
+        global $USER, $DB;
+
+        $feedback = (object) ['userid' => $USER->id,
+            'galleryid' => $this->id,
+            'feedback' => $text,
+            'timecreated' => time()];
+
+        return $DB->insert_record('mediagallery_swipefeedback', $feedback);
     }
 }
