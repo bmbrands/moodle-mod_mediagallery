@@ -34,13 +34,15 @@
 
 
 
-    <div class="wrap">
+    <div class="wrap {{^hascards}}hidden{{/hascards}}" data-region="swipe-wrapper">
 
         <!-- start jtinder container -->
         <div id="tinderslide">
+            {{#endofdeck}}
             <div class="endofdeck">
                 {{{endofdeck}}}
             </div>
+            {{/endofdeck}}
             <ul>
                 {{#cards}}
                 <li class="pane card {{#first}} boxshadow {{/first}} {{#like.likedbyme}}border-success{{/like.likedbyme}}"
@@ -107,7 +109,6 @@
         <!-- end jtinder container -->
     </div>
     <!-- end padding container -->
-
     <div class="feedback form-group {{#hascards}}hidden{{/hascards}} mb-5 p-3 bg-light" data-region="feedback-container" data-galleryid="{{galleryid}}">
         <div class="feedback-input {{^cancomment}}hidden{{/cancomment}}" data-region="feedback-input">
             <label for="galleryfeedback">{{#str}} feedback, mod_mediagallery {{/str}}</label>

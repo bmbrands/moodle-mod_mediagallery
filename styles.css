@@ -671,6 +671,10 @@ body.mediaboxactive .gallery .mediaplugin object {
   min-height: 437px;
   display: flex;
   overflow: hidden; }
+  .swipelike .wrap.hidden {
+    display: none;
+    min-height: 0;
+    height: 0; }
 
 .swipelike .moveup {
   margin-top: -18px; }

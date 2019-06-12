@@ -1069,6 +1069,8 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
         $template->galleryid = $gallery->id;
         $template->galleryname = $gallery->name;
         $template->endofdeck = $gallery->agents;
+        // End of deck message disabled so it is easier for mobile users to scroll.
+        $template->endofdeck = false;
         $template->canedit = $gallery->user_can_edit();
         $template->editurl = new moodle_url('/mod/mediagallery/view.php', array('g' => $gallery->id, 'editing' => 1));
 
@@ -1410,7 +1412,10 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
 
         if (isguestuser()) {
             if (isset($_COOKIE['hascomment'])) {
-                return false;
+                $hascomments = json_decode($_COOKIE['hascomment']);
+                if (is_array($hascomments) && in_array($galleryid, $hascomments)) {
+                    return false;
+                }
             }
             return true;
         };

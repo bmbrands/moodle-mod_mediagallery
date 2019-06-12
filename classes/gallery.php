@@ -538,7 +538,16 @@ class gallery extends base {
         global $USER, $DB;
 
         if (isguestuser()) {
-            setcookie('hascomment', '1', time() + (86400 * 30), "/");
+            $withcomments = [];
+            $withcomments[] = $this->id;
+            if (isset($_COOKIE['hascomment'])) {
+                $hascomments = json_decode($_COOKIE['hascomment']);
+                if (is_array($hascomments)) {
+                    $withcomments = $hascomments;
+                    $withcomments[] = $this->id;
+                }
+            }
+            setcookie('hascomment', json_encode($withcomments), time() + (86400 * 30), "/");
         }
         $feedback = (object) ['userid' => $USER->id,
             'galleryid' => $this->id,

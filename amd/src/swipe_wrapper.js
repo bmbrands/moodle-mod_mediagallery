@@ -42,6 +42,7 @@ function(
     textFit
 ) {
     var SELECTORS = {
+        WRAPPER: '[data-region="swipe-wrapper"]',
         LIKE: '[data-action="like"]',
         DISLIKE: '[data-action="dislike"]',
         VIEW_INFO: '[data-action="info"]',
@@ -192,6 +193,7 @@ function(
         if (card.attr('data-last')) {
             root.find(SELECTORS.ACTION_CONTAINER).addClass('hidden');
             root.find(SELECTORS.FEEDBACK_CONTAINER).removeClass('hidden');
+            root.find(SELECTORS.WRAPPER).addClass('hidden');
         }
 
         if (preloadid) {
