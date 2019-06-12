@@ -537,6 +537,9 @@ class gallery extends base {
     public function store_feedback($text) {
         global $USER, $DB;
 
+        if (isguestuser()) {
+            setcookie('hascomment', '1', time() + (86400 * 30), "/");
+        }
         $feedback = (object) ['userid' => $USER->id,
             'galleryid' => $this->id,
             'feedback' => $text,

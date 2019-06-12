@@ -684,6 +684,7 @@ body.mediaboxactive .gallery .mediaplugin object {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   overflow-y: auto; }
 
 .swipelike #tinderslide {
@@ -771,6 +772,11 @@ body.mediaboxactive .gallery .mediaplugin object {
     height: 350px;
     overflow: hidden;
     font-size: 3rem; }
+  .swipelike #tinderslide .nofooter .card-image,
+  .swipelike #tinderslide .nofooter .card-video,
+  .swipelike #tinderslide .nofooter .card-text {
+    height: 400px;
+    margin-bottom: 0; }
   .swipelike #tinderslide .card-info {
     transition: all 0.2s ease-in-out; }
   .swipelike #tinderslide .card-footer {

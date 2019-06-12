@@ -1061,6 +1061,9 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
     public function view_cards(gallery $gallery, $context) {
 
         $template = new stdClass();
+        // change to true to show card name and nr. of likes.
+        $template->showcardfooter = false;
+        $template->cancomment = $this->user_can_comment_on_gallery($gallery->id);
         $template->modurl = new moodle_url('/mod/mediagallery/img/');
         $template->type = $gallery->type(true);
         $template->galleryid = $gallery->id;
@@ -1395,6 +1398,29 @@ class mod_mediagallery_renderer extends plugin_renderer_base {
             }
         }
         return array_values($comments);
+    }
+
+    /**
+     *
+     * @param int $cardid
+     * @return comment
+     */
+    public static function user_can_comment_on_gallery($galleryid) {
+        global $DB, $USER;
+
+        if (isguestuser()) {
+            if (isset($_COOKIE['hascomment'])) {
+                return false;
+            }
+            return true;
+        };
+
+        $numcomments = $DB->get_records('mediagallery_swipefeedback', ['galleryid' => $galleryid, 'userid' => $USER->id]);
+
+        if (count($numcomments) == 0) {
+            return true;
+        }
+        return false;
     }
 }
 
