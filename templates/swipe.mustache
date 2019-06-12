@@ -32,8 +32,6 @@
         </div>
     {{/warning}}
 
-
-
     <div class="wrap {{^hascards}}hidden{{/hascards}}" data-region="swipe-wrapper">
 
         <!-- start jtinder container -->
@@ -109,10 +107,10 @@
         <!-- end jtinder container -->
     </div>
     <!-- end padding container -->
-    <div class="feedback form-group {{#hascards}}hidden{{/hascards}} mb-5 p-3 bg-light" data-region="feedback-container" data-galleryid="{{galleryid}}">
+    <div class="feedback form-group {{#hascards}}hidden{{/hascards}} mt-3 mb-5 p-3 bg-light" data-region="feedback-container" data-galleryid="{{galleryid}}">
         <div class="feedback-input {{^cancomment}}hidden{{/cancomment}}" data-region="feedback-input">
             <label for="galleryfeedback">{{#str}} feedback, mod_mediagallery {{/str}}</label>
-            <textarea class="form-control rounded" id="galleryfeedback" placeholder="{{#str}}enterfeedback, mod_mediagallery{{/str}}" rows="3" data-region="feedback-text"></textarea>
+            <textarea class="form-control rounded" id="galleryfeedback" placeholder="{{#str}}enterfeedback, mod_mediagallery{{/str}}" rows="6" data-region="feedback-text"></textarea>
             <div class="d-flex">
                 <button type="submit" class="btn btn-primary mb-2 mt-1 rounded ml-auto" data-action="send-feedback">{{#str}}sendfeedback, mod_mediagallery{{/str}}</button>
             </div>
